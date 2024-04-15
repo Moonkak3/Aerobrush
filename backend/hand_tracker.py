@@ -186,17 +186,7 @@ def main():
                     2,
                     cv2.LINE_AA,
                 )
-
-                # cv2.putText(
-                #     frame,
-                #     value(hand_landmarks),
-                #     (50, 200),
-                #     cv2.FONT_HERSHEY_SIMPLEX,
-                #     1,
-                #     (0, 255, 0),
-                #     2,
-                #     cv2.LINE_AA,
-                # )
+                
         # Display the resulting frame
         cv2.imshow("Hand Gesture Recognition", frame)
 
