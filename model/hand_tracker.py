@@ -4,14 +4,7 @@ Python program to recognize hand gestures from a live stream using OpenCV and mp
 
 import cv2
 import mediapipe as mp
-
-
-def dist(landmark1, landmark2):
-    return (
-        (landmark1.x - landmark2.x) ** 2
-        + (landmark1.y - landmark2.y) ** 2
-        + (landmark1.z - landmark2.z) ** 2
-    ) ** 0.5
+from math_func import *
 
 
 def get_gesture(hand_landmarks):
@@ -40,6 +33,9 @@ def get_gesture(hand_landmarks):
         "middle_pip": hand_landmarks.landmark[
             mp.solutions.hands.HandLandmark.MIDDLE_FINGER_PIP
         ],
+        "middle_dip": hand_landmarks.landmark[
+            mp.solutions.hands.HandLandmark.MIDDLE_FINGER_DIP
+        ],
         "middle_tip": hand_landmarks.landmark[
             mp.solutions.hands.HandLandmark.MIDDLE_FINGER_TIP
         ],
@@ -61,25 +57,26 @@ def get_gesture(hand_landmarks):
         "pinky_tip": hand_landmarks.landmark[mp.solutions.hands.HandLandmark.PINKY_TIP],
     }
 
-
-
     threshold = max(
         [
-            dist(lm["index_mcp"], lm["pinky_mcp"]),
-            dist(lm["pinky_mcp"], lm["wrist"]),
-            dist(lm["wrist"], lm["thumb_cmc"]),
-            dist(lm["thumb_cmc"], lm["index_mcp"]),
+            dist2D(lm["index_mcp"], lm["pinky_mcp"]),
+            dist2D(lm["pinky_mcp"], lm["wrist"]),
+            dist2D(lm["wrist"], lm["thumb_cmc"]),
+            dist2D(lm["thumb_cmc"], lm["index_mcp"]),
         ]
     )
-    threshold_clench = threshold / 2
-    threshold_point_on = threshold / 5
+
     if (
-        dist(lm["middle_mcp"], lm["middle_tip"]) < threshold_clench
-        and dist(lm["ring_mcp"], lm["ring_tip"]) < threshold_clench
-        and dist(lm["pinky_mcp"], lm["pinky_tip"]) < threshold_clench
+        check_inside(lm["wrist"], lm["middle_tip"], lm["middle_pip"])
+        and check_inside(lm["wrist"], lm["ring_tip"], lm["ring_pip"])
+        and check_inside(lm["wrist"], lm["pinky_tip"], lm["pinky_pip"])
     ):
-        if dist(lm["index_tip"], lm["middle_tip"]) > threshold_clench:
-            if dist(lm["thumb_tip"], lm["middle_pip"]) < threshold_point_on:
+        if not check_inside(lm["index_pip"], lm["index_tip"], lm["index_mcp"]):
+            # if check_inside(lm["wrist"], lm["thumb_tip"], lm["index_mcp"]):
+            if (
+                dist3D(lm["thumb_tip"], lm["middle_pip"]) < threshold / 2
+                or dist3D(lm["thumb_tip"], lm["middle_dip"]) < threshold / 2
+            ):
                 return "point_on"
             else:
                 return "point_off"
@@ -137,10 +134,10 @@ def value(hand_landmarks):
 
     threshold = max(
         [
-            dist(lm["index_mcp"], lm["pinky_mcp"]),
-            dist(lm["pinky_mcp"], lm["wrist"]),
-            dist(lm["wrist"], lm["thumb_cmc"]),
-            dist(lm["thumb_cmc"], lm["index_mcp"]),
+            dist3D(lm["index_mcp"], lm["pinky_mcp"]),
+            dist3D(lm["pinky_mcp"], lm["wrist"]),
+            dist3D(lm["wrist"], lm["thumb_cmc"]),
+            dist3D(lm["thumb_cmc"], lm["index_mcp"]),
         ]
     )
 
@@ -190,16 +187,16 @@ def main():
                     cv2.LINE_AA,
                 )
 
-                cv2.putText(
-                    frame,
-                    value(hand_landmarks),
-                    (50, 200),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (0, 255, 0),
-                    2,
-                    cv2.LINE_AA,
-                )
+                # cv2.putText(
+                #     frame,
+                #     value(hand_landmarks),
+                #     (50, 200),
+                #     cv2.FONT_HERSHEY_SIMPLEX,
+                #     1,
+                #     (0, 255, 0),
+                #     2,
+                #     cv2.LINE_AA,
+                # )
         # Display the resulting frame
         cv2.imshow("Hand Gesture Recognition", frame)
 
