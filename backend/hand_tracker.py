@@ -6,7 +6,6 @@ import cv2
 import mediapipe as mp
 from math_func import *
 
-
 def get_gesture(hand_landmarks):
 
     lm = {
@@ -196,7 +195,6 @@ def main():
     # Release the VideoCapture object and destroy windows
     cap.release()
     cv2.destroyAllWindows()
-
 
 if __name__ == "__main__":
     main()
