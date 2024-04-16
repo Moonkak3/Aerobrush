@@ -1,9 +1,15 @@
 <template>
     <div>
-        <div class="live-stream-container">
-            <video ref="videoElement" autoplay></video>
-            <canvas ref="canvasElement"></canvas>
+        <div class="container">
+            <div class="live-stream-container">
+                <video ref="videoElement" autoplay></video>
+                <canvas ref="canvasElement"></canvas>
+            </div>
         </div>
+
+        <h1>
+            {{ gesture }}
+        </h1>
         <button @click="toggleWebcam">
             {{ webcamRunning ? "Disable Predictions" : "Enable Predictions" }}
         </button>
@@ -16,6 +22,9 @@
 import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
+
+import { getGesture } from "@/assets/scripts/gestureUtils.js"; // Update the path
+
 export default {
     data() {
         return {
@@ -23,6 +32,7 @@ export default {
             webcamRunning: false,
             lastVideoTime: -1,
             results: undefined,
+            gesture: undefined,
         };
     },
     mounted() {
@@ -113,7 +123,6 @@ export default {
             );
             if (this.results && this.results.landmarks) {
                 for (const landmarks of this.results.landmarks) {
-                    // console.log(landmarks);
                     drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
                         color: "#00FF00",
                         lineWidth: 5,
@@ -122,6 +131,7 @@ export default {
                         color: "#FF0000",
                         lineWidth: 2,
                     });
+                    this.gesture = getGesture(landmarks);
                 }
             }
 
@@ -139,18 +149,31 @@ export default {
 };
 </script>
 <style scoped>
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 .live-stream-container {
+    display: block;
     position: relative;
 }
 
 .live-stream-container video {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
     display: block;
     height: auto;
-    position: absolute;
+    position: relative;
     z-index: 1; /* Video is behind the canvas */
 }
 
 .live-stream-container canvas {
+    transform: rotateY(180deg);
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
     position: absolute;
     top: 0;
     left: 0;

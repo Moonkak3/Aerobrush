@@ -1,0 +1,86 @@
+@import "variables.scss";
+
+$font-family_1: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: $font-family_1;
+}
+html {
+    width: 100vw;
+}
+body {
+    background: $body-color;
+    // background-image: radial-gradient(#111822, $primary-color);
+
+    background-image: radial-gradient(
+            circle at center,
+            hsla(232, 100%, 75%, 0.012),
+            hsla(232, 100%, 75%, 0.012),
+            transparent
+        ),
+        linear-gradient(to right, hsla(232, 100%, 75%, 0.01), transparent),
+        linear-gradient(to bottom, hsla(232, 100%, 75%, 0.01), transparent);
+
+    background-attachment: fixed;
+    background-color: hsl(
+        232,
+        20%,
+        7%
+    ); /* Modify to better match your desired base color */
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: $text-color;
+    overflow-x: hidden;
+}
+
+.card {
+    // display: grid;
+    position: relative;
+    width: 100%;
+    border-width: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+    color: $text-color;
+    background-color: $body-color;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 1), 0 8px 20px 0 rgba(0, 0, 0, 0.7),
+        0 10px 20px 0 rgba(0, 0, 0, 0.7);
+    transition: 0.5s;
+
+    .card-link::before {
+        content: "";
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        left: 0px;
+    }
+
+    &.expanding {
+        &:hover {
+            z-index: 10;
+            transform: scale(1.05);
+        }
+    }
+    &.light:hover {
+        box-shadow: 0 4px 8px 0 rgba($primary-color, 0.8),
+            0 8px 20px 0 rgba($primary-color, 0.2);
+    }
+    &.success:hover {
+        box-shadow: 0 4px 8px 0 rgba(#04aa6d, 0.8),
+            0 8px 20px 0 rgba(#04aa6d, 0.2);
+    }
+    &.error:hover {
+        box-shadow: 0 4px 8px 0 rgba(#f44336, 0.8),
+            0 8px 20px 0 rgba(#f44336, 0.2);
+    }
+    &.info:hover {
+        box-shadow: 0 4px 8px 0 rgba(#2196f3, 0.8),
+            0 8px 20px 0 rgba(#2196f3, 0.2);
+    }
+}
