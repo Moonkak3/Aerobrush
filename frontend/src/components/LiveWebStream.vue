@@ -125,11 +125,11 @@ export default {
                 for (const landmarks of this.results.landmarks) {
                     drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
                         color: "#00FF00",
-                        lineWidth: 5,
+                        lineWidth: 2,
                     });
                     drawLandmarks(canvasCtx, landmarks, {
                         color: "#FF0000",
-                        lineWidth: 2,
+                        lineWidth: 0.5,
                     });
                     this.gesture = getGesture(landmarks);
                 }

@@ -1,4 +1,4 @@
-import { dist2D, checkInside } from "./vectorUtils.js";
+import { dist2D, dist3D, checkInside } from "./vectorUtils.js";
 
 // lm: handLandMarks
 function getGesture(lm) {
@@ -16,11 +16,11 @@ function getGesture(lm) {
         checkInside(lm[0], lm[20], lm[18])
     ) {
         // check if index and thumb are closed
+        let distTip = dist3D(lm[4], lm[8])
+        let distJoint = dist3D(lm[3], lm[7])
         if (
-            // checkInside(lm[3], lm[4], lm[7]) &&
-            // checkInside(lm[3], lm[8], lm[7])
-            dist2D(lm[4], lm[8]) <
-            threshold / 4
+            distTip < distJoint &&
+            distTip < threshold / 3
         ) {
             return "on";
         } else {
