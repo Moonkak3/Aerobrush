@@ -50,8 +50,7 @@ body {
     overflow: hidden;
     color: $text-color;
     background-color: $body-color;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 1), 0 8px 20px 0 rgba(0, 0, 0, 0.7),
-        0 10px 20px 0 rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0px 10px 2px rgba($body-color, 0.6);
 
     .card-link::before {
         content: "";
@@ -70,19 +69,15 @@ body {
     }
     &.light:hover {
         box-shadow: 0 4px 8px 0 rgba($primary-color, 0.8),
-            0 8px 20px 0 rgba($primary-color, 0.2);
     }
     &.success:hover {
         box-shadow: 0 4px 8px 0 rgba(#04aa6d, 0.8),
-            0 8px 20px 0 rgba(#04aa6d, 0.2);
     }
     &.error:hover {
         box-shadow: 0 4px 8px 0 rgba(#f44336, 0.8),
-            0 8px 20px 0 rgba(#f44336, 0.2);
     }
     &.info:hover {
         box-shadow: 0 4px 8px 0 rgba(#2196f3, 0.8),
-            0 8px 20px 0 rgba(#2196f3, 0.2);
     }
 }
 

@@ -20,11 +20,11 @@ function getGesture(lm) {
         let distJoint = dist3D(lm[3], lm[7])
         if (
             distTip < distJoint &&
-            distTip < threshold / 2
+            distTip < threshold / 4
         ) {
-            return "on";
+            return "click";
         } else {
-            return "off";
+            return "unclick";
         }
     }
     return "open";

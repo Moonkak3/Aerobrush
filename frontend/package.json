@@ -12,6 +12,7 @@
     "@mediapipe/hands": "^0.4.1675469240",
     "@mediapipe/tasks-vision": "^0.10.0",
     "core-js": "^3.8.3",
+    "pinia": "^2.1.7",
     "vue": "^3.2.13"
   },
   "devDependencies": {
