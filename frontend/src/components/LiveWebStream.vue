@@ -283,7 +283,7 @@ button {
 .card {
     position: fixed;
     cursor: grab;
-    transition: 50ms;
+    /* transition: 50ms; */
     z-index: 1;
 }
 </style>

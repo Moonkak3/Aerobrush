@@ -20,8 +20,10 @@ export default {
         };
     },
     mounted() {
-        this.$refs.canvas.width = window.innerWidth;
-        this.$refs.canvas.height = window.innerHeight;
+        this.$refs.canvas.width = 1920;
+        this.$refs.canvas.height = 1080;
+        this.$refs.canvas.left = (window.innerWidth - 1920) / 2;
+        this.$refs.canvas.top = (window.innerHeight - 1080) / 2;
         this.context = this.$refs.canvas.getContext("2d");
     },
     methods: {

@@ -40,6 +40,6 @@ export default {
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
-    transition: 50ms;
+    // transition: 50ms;
 }
 </style>
