@@ -1,5 +1,11 @@
 <template>
-    <div>
+    <div
+        class="card"
+        :style="{ top: divTop + 'px', left: divLeft + 'px' }"
+        @mousedown="startDragging"
+        @mousemove="dragging"
+        @mouseup="stopDragging"
+    >
         <div class="container">
             <div class="live-stream-container">
                 <video ref="videoElement" autoplay></video>
@@ -33,6 +39,12 @@ export default {
             lastVideoTime: -1,
             results: undefined,
             gesture: undefined,
+
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            divTop: 0, // Initial top position
+            divLeft: 0, // Initial left position
         };
     },
     mounted() {
@@ -67,7 +79,11 @@ export default {
         },
         async enableWebcam() {
             const videoElement = this.$refs.videoElement;
-            const constraints = { video: true };
+            const constraints = {
+                video: {
+                    aspectRatio: 16/9,
+                },
+            };
 
             if (
                 !navigator.mediaDevices ||
@@ -99,8 +115,8 @@ export default {
             const canvasElement = this.$refs.canvasElement;
             const canvasCtx = canvasElement.getContext("2d");
 
-            canvasElement.width = videoElement.videoWidth;
-            canvasElement.height = videoElement.videoHeight;
+            canvasElement.width = videoElement.clientWidth;
+            canvasElement.height = videoElement.clientHeight;
 
             // if (this.runningMode === "IMAGE") {
             //     this.runningMode = "VIDEO";
@@ -123,15 +139,23 @@ export default {
             );
             if (this.results && this.results.landmarks) {
                 for (const landmarks of this.results.landmarks) {
-                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
-                        color: "#00FF00",
-                        lineWidth: 2,
+                    const modifiedLandmarks = landmarks.map((point) => {
+                        return { ...point, x: 1 - point.x };
                     });
-                    drawLandmarks(canvasCtx, landmarks, {
+                    drawConnectors(
+                        canvasCtx,
+                        modifiedLandmarks,
+                        HAND_CONNECTIONS,
+                        {
+                            color: "#00FF00",
+                            lineWidth: 2,
+                        }
+                    );
+                    drawLandmarks(canvasCtx, modifiedLandmarks, {
                         color: "#FF0000",
                         lineWidth: 0.5,
                     });
-                    this.gesture = getGesture(landmarks);
+                    this.gesture = getGesture(modifiedLandmarks);
                 }
             }
 
@@ -144,6 +168,28 @@ export default {
             if (this.webcamRunning) {
                 this.enableWebcam();
             }
+        },
+        startDragging(event) {
+            console.log(event);
+            this.isDragging = true;
+            this.startX = event.clientX - this.divLeft;
+            this.startY = event.clientY - this.divTop;
+            console.log(this.startX, this.startY);
+            document.body.addEventListener("mousemove", this.dragging);
+            document.body.addEventListener("mouseup", this.stopDragging);
+        },
+        dragging(event) {
+            // console.log(event);
+            if (this.isDragging) {
+                this.divLeft = event.clientX - this.startX;
+                this.divTop = event.clientY - this.startY;
+            }
+        },
+        stopDragging() {
+            // cons+ole.log(event);
+            this.isDragging = false;
+            document.body.removeEventListener("mousemove", this.dragging);
+            document.body.removeEventListener("mouseup", this.stopDragging);
         },
     },
 };
@@ -161,22 +207,33 @@ export default {
 }
 
 .live-stream-container video {
+    pointer-events: none;
     transform: rotateY(180deg);
     -webkit-transform: rotateY(180deg);
     -moz-transform: rotateY(180deg);
     display: block;
-    height: auto;
+    aspect-ratio: 16/9;
+    height: 240px;
     position: relative;
     z-index: 1; /* Video is behind the canvas */
 }
 
 .live-stream-container canvas {
-    transform: rotateY(180deg);
+    /* transform: rotateY(180deg);
     -webkit-transform: rotateY(180deg);
-    -moz-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg); */
     position: absolute;
     top: 0;
     left: 0;
     z-index: 2; /* Canvas is on top of the video */
+}
+
+button {
+    margin: 2rem;
+}
+
+.card {
+    position: fixed;
+    cursor: grab;
 }
 </style>
