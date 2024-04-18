@@ -33,11 +33,7 @@ export default {
     transform: translate(-50%, -50%);
     width: 20px;
     height: 20px;
-    background: linear-gradient(
-        to right,
-        hsl(350, 100%, 59%),
-        hsl(330, 100%, 59%)
-    );
+    background: $primary-color;
     border-color: white;
     border-width: 2px;
     border-style: solid;

@@ -27,6 +27,10 @@ function dist3D(landmark1, landmark2, root = true) {
     return value;
 }
 
+function dot2D(landmark1, landmark2) {
+    return landmark1.x * landmark2.x + landmark1.y * landmark2.y;
+}
+
 function dot3D(landmark1, landmark2) {
     return (
         landmark1.x * landmark2.x +
@@ -35,8 +39,11 @@ function dot3D(landmark1, landmark2) {
     );
 }
 
-function dot2D(landmark1, landmark2) {
-    return landmark1.x * landmark2.x + landmark1.y * landmark2.y;
+function avgPoint(landmark1, landmark2, ratio = 0.5) {
+    return new Vector(
+        landmark1.x * ratio + landmark2.x * (1 - ratio),
+        landmark1.y * ratio + landmark2.y * (1 - ratio)
+    );
 }
 
 function checkInside(A, B, C) {
@@ -52,4 +59,4 @@ function checkInside(A, B, C) {
     }
 }
 
-export { Vector, dist2D, dist3D, dot3D, dot2D, checkInside };
+export { Vector, dist2D, dist3D, dot3D, dot2D, avgPoint, checkInside };

@@ -28,7 +28,7 @@
 import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
-import { getGesture } from "@/assets/scripts/gestureUtils.js"; // Update the path
+import { getCursor, getGesture } from "@/assets/scripts/gestureUtils.js"; // Update the path
 // import { handCursorStore } from "@/stores/handCursor";
 
 export default {
@@ -141,95 +141,84 @@ export default {
                 canvasElement.height
             );
             if (this.results && this.results.landmarks) {
-                for (const landmarks of this.results.landmarks) {
-                    const modifiedLandmarks = landmarks.map((point) => {
-                        return { ...point, x: 1 - point.x };
-                    });
-
-                    drawConnectors(
-                        canvasCtx,
-                        modifiedLandmarks,
-                        HAND_CONNECTIONS,
-                        {
-                            color: "#00FF00",
-                            lineWidth: 2,
-                        }
-                    );
-                    drawLandmarks(canvasCtx, modifiedLandmarks, {
-                        color: "#FF0000",
-                        lineWidth: 0.5,
-                    });
-
-                    this.gesture = getGesture(modifiedLandmarks);
-
-                    this.history.unshift(this.gesture);
-                    while (this.history.length > 10) {
-                        this.history.pop();
-                    }
-
-                    // this.handCursor.click =
-                    //     this.gesture === "click" ? true : false;
-
-                    let eventType = null;
-
-                    // Perform actions based on the gesture
-                    switch (this.gesture) {
-                        case "click":
-                            eventType = "mousedown";
-                            break;
-                        case "unclick":
-                            eventType = "mouseup";
-                            break;
-                        case "open":
-                            eventType = "mouseup";
-                            break;
-                        default:
-                            // Perform default action
-                            break;
-                    }
-                    let x = modifiedLandmarks[8].x * window.innerWidth;
-                    let y = modifiedLandmarks[8].y * window.innerHeight;
-                    let target =
-                        document.elementFromPoint(x, y) ?? document.body;
-                    let eventOptions = {
-                        bubbles: true, // Whether the event bubbles up through the DOM or not
-                        cancelable: true, // Whether the event is cancelable
-                        // Additional properties depending on the type of MouseEvent
-                        clientX: x, // X coordinate of the mouse pointer in client coordinates
-                        clientY: y, // Y coordinate of the mouse pointer in client coordinates
-                    };
-
-                    const event1 = new MouseEvent("mousemove", eventOptions);
-                    target.dispatchEvent(event1);
-
-                    if (
-                        (this.isDown && eventType === "mouseup") ||
-                        (!this.isDown && eventType === "mousedown")
-                    ) {
-                        this.isDown = !this.isDown;
-                        const event2 = new MouseEvent(eventType, eventOptions);
-                        target.dispatchEvent(event2);
-                        if (eventType === "mouseup") {
-                            const event3 = new MouseEvent(
-                                "click",
-                                eventOptions
-                            );
-                            target.dispatchEvent(event3);
-                        }
-                    }
-                }
+                this.interpretLandMarks(this.results.landmarks, canvasCtx);
             }
 
             if (this.webcamRunning) {
                 window.requestAnimationFrame(this.predictWebcam);
             }
         },
-        // toggleWebcam() {
-        //     this.webcamRunning = !this.webcamRunning;
-        //     if (this.webcamRunning) {
-        //         this.enableWebcam();
-        //     }
-        // },
+        interpretLandMarks(resultsLandmarks, canvasCtx) {
+            for (const landmarks of resultsLandmarks) {
+                const modifiedLandmarks = landmarks.map((point) => {
+                    return { ...point, x: 1 - point.x };
+                });
+
+                drawConnectors(canvasCtx, modifiedLandmarks, HAND_CONNECTIONS, {
+                    color: "#00FF00",
+                    lineWidth: 2,
+                });
+                drawLandmarks(canvasCtx, modifiedLandmarks, {
+                    color: "#FF0000",
+                    lineWidth: 0.5,
+                });
+
+                this.gesture = getGesture(modifiedLandmarks);
+
+                this.history.unshift(this.gesture);
+                while (this.history.length > 10) {
+                    this.history.pop();
+                }
+
+                // this.handCursor.click =
+                //     this.gesture === "click" ? true : false;
+
+                let eventType = null;
+
+                // Perform actions based on the gesture
+                switch (this.gesture) {
+                    case "click":
+                        eventType = "mousedown";
+                        break;
+                    case "unclick":
+                        eventType = "mouseup";
+                        break;
+                    case "open":
+                        eventType = "mouseup";
+                        break;
+                    default:
+                        // Perform default action
+                        break;
+                }
+                let [x, y] = getCursor(modifiedLandmarks)
+                x *= window.innerWidth;
+                y *= window.innerHeight;
+                let target = document.elementFromPoint(x, y) ?? document.body;
+                let eventOptions = {
+                    bubbles: true, // Whether the event bubbles up through the DOM or not
+                    cancelable: true, // Whether the event is cancelable
+                    // Additional properties depending on the type of MouseEvent
+                    clientX: x, // X coordinate of the mouse pointer in client coordinates
+                    clientY: y, // Y coordinate of the mouse pointer in client coordinates
+                };
+
+                const event1 = new MouseEvent("mousemove", eventOptions);
+                target.dispatchEvent(event1);
+
+                if (
+                    (this.isDown && eventType === "mouseup") ||
+                    (!this.isDown && eventType === "mousedown")
+                ) {
+                    this.isDown = !this.isDown;
+                    const event2 = new MouseEvent(eventType, eventOptions);
+                    target.dispatchEvent(event2);
+                    if (eventType === "mouseup") {
+                        const event3 = new MouseEvent("click", eventOptions);
+                        target.dispatchEvent(event3);
+                    }
+                }
+            }
+        },
         startDragging(event) {
             this.isDragging = true;
             this.startX = event.clientX - this.divLeft;
