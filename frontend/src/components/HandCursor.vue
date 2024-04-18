@@ -7,6 +7,13 @@
 <script>
 export default {
     name: "HandCursor",
+    data() {
+        return {
+            lastX: 0,
+            lastY: 0,
+            lazyRadius: 10,
+        };
+    },
     mounted() {
         // Add event listeners to track cursor movement
         document.addEventListener("mousemove", this.handleMouseMove);
@@ -19,8 +26,24 @@ export default {
         handleMouseMove(event) {
             // Update cursor position based on mouse movement
             const cursor = document.querySelector(".cursor");
-            cursor.style.left = event.clientX + "px";
-            cursor.style.top = event.clientY + "px";
+
+            // calculating bx, by
+            // (brushX and brushY, which accounts for a lazy radius)
+            const dx = event.clientX - this.lastX;
+            const dy = event.clientY - this.lastY;
+            const dist = (dx ** 2 + dy ** 2) ** 0.5;
+
+            if (dist < this.lazyRadius) return;
+
+            const proportion = (dist - this.lazyRadius) / dist;
+            const bx = this.lastX + dx * proportion;
+            const by = this.lastY + dy * proportion;
+
+            cursor.style.left = bx + "px";
+            cursor.style.top = by + "px";
+
+            this.lastX = bx;
+            this.lastY = by;
         },
     },
 };

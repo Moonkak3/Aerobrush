@@ -46,8 +46,8 @@ export default {
             isDragging: false,
             startX: 0,
             startY: 0,
-            divTop: 0, // Initial top position
-            divLeft: 0, // Initial left position
+            divTop: 20, // Initial top position
+            divLeft: 20, // Initial left position
         };
     },
     mounted() {
@@ -263,13 +263,11 @@ export default {
     height: 240px;
     position: relative;
     border-radius: 1rem;
+    filter: brightness(60%) grayscale(100%);
     z-index: 1; /* Video is behind the canvas */
 }
 
 .live-stream-container canvas {
-    /* transform: rotateY(180deg);
-    -webkit-transform: rotateY(180deg);
-    -moz-transform: rotateY(180deg); */
     position: absolute;
     top: 0;
     left: 0;
@@ -283,7 +281,6 @@ button {
 .card {
     position: fixed;
     cursor: grab;
-    /* transition: 50ms; */
     z-index: 1;
 }
 
