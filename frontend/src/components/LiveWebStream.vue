@@ -14,7 +14,7 @@
         </div>
 
         <h1>
-            {{ gesture }}
+            Gesture: {{ gesture }}
         </h1>
         <!-- <button @click="toggleWebcam">
             {{ webcamRunning ? "Disable Predictions" : "Enable Predictions" }}
@@ -74,7 +74,6 @@ export default {
                 );
 
                 // HandLandmarker is now initialized and ready to use
-                console.log(this.handLandmarker);
                 console.log("HandLandmarker initialized.");
             } catch (error) {
                 console.error("Error initializing HandLandmarker:", error);
@@ -190,7 +189,7 @@ export default {
                         // Perform default action
                         break;
                 }
-                let [x, y] = getCursor(modifiedLandmarks)
+                let [x, y] = getCursor(modifiedLandmarks);
                 x *= window.innerWidth;
                 y *= window.innerHeight;
                 let target = document.elementFromPoint(x, y) ?? document.body;
@@ -263,6 +262,7 @@ export default {
     aspect-ratio: 16/9;
     height: 240px;
     position: relative;
+    border-radius: 1rem;
     z-index: 1; /* Video is behind the canvas */
 }
 
@@ -285,5 +285,11 @@ button {
     cursor: grab;
     /* transition: 50ms; */
     z-index: 1;
+}
+
+h1 {
+    margin: 1rem;
+    text-align: left;
+    
 }
 </style>
