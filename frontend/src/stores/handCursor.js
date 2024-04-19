@@ -3,9 +3,10 @@ import { defineStore } from "pinia";
 export const handCursorStore = defineStore("handCursor", {
     state: () => {
         return {
-            click: false,
-            clientX: 0,
-            clientY: 0,
+            x: 0,
+            y: 0,
+            mode: "draw",
+            lazyRadius: 0,
         };
     },
 });

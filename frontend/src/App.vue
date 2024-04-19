@@ -1,7 +1,7 @@
 <template>
     <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
     <HandCursor />
-    <LiveWebStream msg="Welcome to Your Vue.js App" />
+    <LiveWebStream />
     <DrawingCanvas />
 </template>
 

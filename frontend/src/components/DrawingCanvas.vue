@@ -1,15 +1,18 @@
 <template>
     <div>
         <canvas
+            id="canvas"
             ref="canvas"
             @mousedown="startDrawing"
             @mousemove="draw"
             @mouseup="stopDrawing"
         ></canvas>
+        <canvas id="background" ref="background"></canvas>
     </div>
 </template>
 
 <script>
+import { handCursorStore } from "@/stores/handCursor";
 export default {
     data() {
         return {
@@ -19,6 +22,7 @@ export default {
             lastY: [],
             lazyRadius: 10,
             smoothing: "bezier",
+            handCursor: handCursorStore(),
         };
     },
     mounted() {
@@ -26,6 +30,10 @@ export default {
         this.$refs.canvas.height = 1080;
         this.$refs.canvas.left = (window.innerWidth - 1920) / 2;
         this.$refs.canvas.top = (window.innerHeight - 1080) / 2;
+        this.$refs.background.width = 1920;
+        this.$refs.background.height = 1080;
+        this.$refs.background.left = (window.innerWidth - 1920) / 2;
+        this.$refs.background.top = (window.innerHeight - 1080) / 2;
         this.ctx = this.$refs.canvas.getContext("2d");
 
         this.ctx.lineCap = "round";
@@ -49,21 +57,16 @@ export default {
         },
         draw(event) {
             if (!this.isDrawing) return;
-            console.log("darwing");
 
             // cursor point
-            const x = event.clientX - this.$refs.canvas.offsetLeft;
-            const y = event.clientY - this.$refs.canvas.offsetTop;
+            const bx = event.clientX - this.$refs.canvas.offsetLeft;
+            const by = event.clientY - this.$refs.canvas.offsetTop;
 
-            // calculating bx, by
-            // (brushX and brushY, which accounts for a lazy radius)
-            const dx = x - this.lastX[0];
-            const dy = y - this.lastY[0];
-            const dist = (dx ** 2 + dy ** 2) ** 0.5;
-            if (dist < this.lazyRadius) return;
-            const proportion = (dist - this.lazyRadius) / dist;
-            const bx = this.lastX[0] + dx * proportion;
-            const by = this.lastY[0] + dy * proportion;
+            if (this.handCursor.mode === "draw") {
+                this.ctx.globalCompositeOperation = "source-over";
+            } else if (this.handCursor.mode === "erase") {
+                this.ctx.globalCompositeOperation = "destination-out";
+            }
 
             this.ctx.beginPath();
             if (this.smoothing === "bezier") {
@@ -108,7 +111,14 @@ canvas {
     position: fixed;
     top: 0;
     left: 0;
-    background-color: white;
     z-index: 0;
+}
+#canvas {
+    background-color: transparent;
+}
+
+#background {
+    z-index: -1;
+    background-color: white;
 }
 </style>

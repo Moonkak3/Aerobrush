@@ -13,12 +13,11 @@
             </div>
         </div>
 
-        <h1>
-            Gesture: {{ gesture }}
-        </h1>
-        <!-- <button @click="toggleWebcam">
-            {{ webcamRunning ? "Disable Predictions" : "Enable Predictions" }}
-        </button> -->
+        <div class="text-container">
+            <h1 v-for="(value, key) in gesture" :key="key">
+                {{ key }}: {{ value }}
+            </h1>
+        </div>
     </div>
 </template>
 
@@ -29,7 +28,8 @@ import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
 import { getCursor, getGesture } from "@/assets/scripts/gestureUtils.js"; // Update the path
-// import { handCursorStore } from "@/stores/handCursor";
+import { handCursorStore } from "@/stores/handCursor";
+// import { create } from "core-js/core/object";
 
 export default {
     data() {
@@ -44,8 +44,12 @@ export default {
 
             isDown: false,
             isDragging: false,
+            lastX: 0,
+            lastY: 0,
             startX: 0,
             startY: 0,
+            handCursor: handCursorStore(),
+
             divTop: 20, // Initial top position
             divLeft: 20, // Initial left position
         };
@@ -169,67 +173,80 @@ export default {
                     this.history.pop();
                 }
 
-                // this.handCursor.click =
-                //     this.gesture === "click" ? true : false;
-
-                let eventType = null;
-
-                // Perform actions based on the gesture
-                switch (this.gesture) {
-                    case "click":
-                        eventType = "mousedown";
-                        break;
-                    case "unclick":
-                        eventType = "mouseup";
-                        break;
-                    case "open":
-                        eventType = "mouseup";
-                        break;
-                    default:
-                        // Perform default action
-                        break;
-                }
+                // this.gesture = (get the mode)
                 let [x, y] = getCursor(modifiedLandmarks);
-                x *= window.innerWidth;
-                y *= window.innerHeight;
-                let target = document.elementFromPoint(x, y) ?? document.body;
-                let eventOptions = {
-                    bubbles: true, // Whether the event bubbles up through the DOM or not
-                    cancelable: true, // Whether the event is cancelable
-                    // Additional properties depending on the type of MouseEvent
-                    clientX: x, // X coordinate of the mouse pointer in client coordinates
-                    clientY: y, // Y coordinate of the mouse pointer in client coordinates
-                };
+                this.updateHandCursor(x, y);
+            }
+        },
+        updateHandCursor(x, y) {
+            let eventType = null;
 
-                const event1 = new MouseEvent("mousemove", eventOptions);
-                target.dispatchEvent(event1);
+            // Perform actions based on the gesture
+            if (this.gesture.close) {
+                this.handCursor.mode = "draw";
+            } else {
+                this.handCursor.mode = "erase";
+            }
+            if (this.gesture.pinch) {
+                eventType = "mousedown";
+            } else {
+                eventType = "mouseup";
+            }
+            x *= window.innerWidth;
+            y *= window.innerHeight;
 
-                if (
-                    (this.isDown && eventType === "mouseup") ||
-                    (!this.isDown && eventType === "mousedown")
-                ) {
-                    this.isDown = !this.isDown;
-                    const event2 = new MouseEvent(eventType, eventOptions);
-                    target.dispatchEvent(event2);
-                    if (eventType === "mouseup") {
-                        const event3 = new MouseEvent("click", eventOptions);
-                        target.dispatchEvent(event3);
-                    }
+            // calculating bx, by
+            // (brushX and brushY, which accounts for a lazy radius)
+            const dx = x - this.lastX;
+            const dy = y - this.lastY;
+            const dist = (dx ** 2 + dy ** 2) ** 0.5;
+
+            console.log(dist);
+            if (dist <= this.handCursor.lazyRadius) return;
+
+            const proportion = (dist - this.handCursor.lazyRadius) / dist;
+            this.handCursor.x = this.lastX + dx * proportion;
+            this.handCursor.y = this.lastY + dy * proportion;
+            this.lastX = this.handCursor.x;
+            this.lastY = this.handCursor.y;
+
+            let target = document.elementFromPoint(x, y) ?? document.body;
+            let eventOptions = {
+                bubbles: true, // Whether the event bubbles up through the DOM or not
+                cancelable: true, // Whether the event is cancelable
+                // Additional properties depending on the type of MouseEvent
+                clientX: this.handCursor.x, // X coordinate of the mouse pointer in client coordinates
+                clientY: this.handCursor.y, // Y coordinate of the mouse pointer in client coordinates
+            };
+
+            const moveEvent = new MouseEvent("mousemove", eventOptions);
+            target.dispatchEvent(moveEvent);
+
+            if (
+                (this.isDown && eventType === "mouseup") ||
+                (!this.isDown && eventType === "mousedown")
+            ) {
+                this.isDown = !this.isDown;
+                const mouseEvent = new MouseEvent(eventType, eventOptions);
+                target.dispatchEvent(mouseEvent);
+                if (eventType === "mouseup") {
+                    const clickEvent = new MouseEvent("click", eventOptions);
+                    target.dispatchEvent(clickEvent);
                 }
             }
         },
-        startDragging(event) {
+        startDragging() {
             this.isDragging = true;
-            this.startX = event.clientX - this.divLeft;
-            this.startY = event.clientY - this.divTop;
+            this.startX = this.handCursor.x - this.divLeft;
+            this.startY = this.handCursor.y - this.divTop;
             document.body.addEventListener("mousemove", this.dragging);
             document.body.addEventListener("mouseup", this.stopDragging);
         },
-        dragging(event) {
+        dragging() {
             // console.log(event);
             if (this.isDragging) {
-                this.divLeft = event.clientX - this.startX;
-                this.divTop = event.clientY - this.startY;
+                this.divLeft = this.handCursor.x - this.startX;
+                this.divTop = this.handCursor.y - this.startY;
             }
         },
         stopDragging() {
@@ -248,6 +265,13 @@ export default {
     align-items: center;
     justify-content: center;
 }
+.text-container {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: left;
+}
 .live-stream-container {
     display: block;
     position: relative;
@@ -263,7 +287,7 @@ export default {
     height: 240px;
     position: relative;
     border-radius: 1rem;
-    filter: brightness(60%) grayscale(100%);
+    filter: grayscale(100%);
     z-index: 1; /* Video is behind the canvas */
 }
 
@@ -285,8 +309,7 @@ button {
 }
 
 h1 {
-    margin: 1rem;
+    margin: 0rem;
     text-align: left;
-    
 }
 </style>
