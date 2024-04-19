@@ -4,6 +4,11 @@
 npm run build
 ```
 
+### Move into outside 
+```
+cd ..
+```
+
 ### Add distribution folder changes to the staging area
 ```
 git add frontend/dist -f
