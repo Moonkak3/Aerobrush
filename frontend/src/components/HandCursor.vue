@@ -55,7 +55,7 @@ export default {
     border-style: solid;
     border-radius: 50%;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 99999;
     // transition: 50ms;
 }
 </style>

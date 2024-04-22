@@ -15,14 +15,15 @@ export const handCursorStore = defineStore("handCursor", {
             isDragging: false,
             lastX: 0,
             lastY: 0,
-            startX: 0,
-            startY: 0,
         };
     },
     actions: {
         updateHandCursor(landmarks) {
             // handle position
             let [rawX, rawY] = getCursor(landmarks);
+
+            rawX = rawX * 1.2 - 0.1;
+            rawY = rawY * 1.2 - 0.1;
 
             rawX *= window.innerWidth;
             rawY *= window.innerHeight;

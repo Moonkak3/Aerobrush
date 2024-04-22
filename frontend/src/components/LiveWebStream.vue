@@ -1,6 +1,7 @@
 <template>
     <div
         class="card"
+        ref="card"
         :style="{ top: divTop + 'px', left: divLeft + 'px' }"
         @mousedown="startDragging"
         @mousemove="dragging"
@@ -28,8 +29,7 @@ import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
 import { handCursorStore } from "@/stores/handCursor";
-// import { Draggable } from "@shopify/draggable";
-// import { create } from "core-js/core/object";
+import Draggable from "draggable";
 
 export default {
     data() {
@@ -52,12 +52,7 @@ export default {
         this.enableWebcam();
         this.createHandLandmarker();
 
-        // const draggable = new Draggable(document.querySelectorAll('card'), {
-        //     draggable: "div",
-        // });
-        // draggable.on("drag:start", () => console.log("drag:start"));
-        // draggable.on("drag:move", () => console.log("drag:move"));
-        // draggable.on("drag:stop", () => console.log("drag:stop"));
+        new Draggable(this.$refs.card);
     },
     methods: {
         async createHandLandmarker() {
@@ -173,27 +168,27 @@ export default {
         // TODO package hand recognition into a js file
         
 
-        // TODO package into a dragging js file
-        startDragging() {
-            this.isDragging = true;
-            this.startX = this.handCursor.x - this.divLeft;
-            this.startY = this.handCursor.y - this.divTop;
-            document.body.addEventListener("mousemove", this.dragging);
-            document.body.addEventListener("mouseup", this.stopDragging);
-        },
-        dragging() {
-            // console.log(event);
-            if (this.isDragging) {
-                this.divLeft = this.handCursor.x - this.startX;
-                this.divTop = this.handCursor.y - this.startY;
-            }
-        },
-        stopDragging() {
-            // cons+ole.log(event);
-            this.isDragging = false;
-            document.body.removeEventListener("mousemove", this.dragging);
-            document.body.removeEventListener("mouseup", this.stopDragging);
-        },
+        // // TODO package into a dragging js file
+        // startDragging() {
+        //     this.isDragging = true;
+        //     this.startX = this.handCursor.x - this.divLeft;
+        //     this.startY = this.handCursor.y - this.divTop;
+        //     document.body.addEventListener("mousemove", this.dragging);
+        //     document.body.addEventListener("mouseup", this.stopDragging);
+        // },
+        // dragging() {
+        //     // console.log(event);
+        //     if (this.isDragging) {
+        //         this.divLeft = this.handCursor.x - this.startX;
+        //         this.divTop = this.handCursor.y - this.startY;
+        //     }
+        // },
+        // stopDragging() {
+        //     // cons+ole.log(event);
+        //     this.isDragging = false;
+        //     document.body.removeEventListener("mousemove", this.dragging);
+        //     document.body.removeEventListener("mouseup", this.stopDragging);
+        // },
     },
 };
 </script>
@@ -242,7 +237,7 @@ button {
 }
 
 .card {
-    position: fixed;
+    position: absolute;
     cursor: grab;
     z-index: 1;
 }
