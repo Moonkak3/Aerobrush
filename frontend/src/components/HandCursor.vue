@@ -33,7 +33,7 @@ export default {
                 cursor.style.backgroundColor = "transparent";
                 cursor.style.borderColor = "#000000";
             }
-
+            
 
             cursor.style.left = event.clientX + "px";
             cursor.style.top = event.clientY + "px";

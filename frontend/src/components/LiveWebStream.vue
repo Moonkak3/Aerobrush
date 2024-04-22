@@ -27,8 +27,8 @@
 import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
-import { getCursor, getGesture } from "@/assets/scripts/gestureUtils.js"; // Update the path
 import { handCursorStore } from "@/stores/handCursor";
+// import { Draggable } from "@shopify/draggable";
 // import { create } from "core-js/core/object";
 
 export default {
@@ -40,14 +40,8 @@ export default {
             lastVideoTime: -1,
             results: undefined,
             gesture: undefined,
-            history: [],
 
-            isDown: false,
-            isDragging: false,
-            lastX: 0,
-            lastY: 0,
-            startX: 0,
-            startY: 0,
+            
             handCursor: handCursorStore(),
 
             divTop: 20, // Initial top position
@@ -57,6 +51,13 @@ export default {
     mounted() {
         this.enableWebcam();
         this.createHandLandmarker();
+
+        // const draggable = new Draggable(document.querySelectorAll('card'), {
+        //     draggable: "div",
+        // });
+        // draggable.on("drag:start", () => console.log("drag:start"));
+        // draggable.on("drag:move", () => console.log("drag:move"));
+        // draggable.on("drag:stop", () => console.log("drag:stop"));
     },
     methods: {
         async createHandLandmarker() {
@@ -165,76 +166,14 @@ export default {
                     color: "#FF0000",
                     lineWidth: 0.5,
                 });
-
-                this.gesture = getGesture(modifiedLandmarks);
-
-                this.history.unshift(this.gesture);
-                while (this.history.length > 10) {
-                    this.history.pop();
-                }
-
                 // this.gesture = (get the mode)
-                let [x, y] = getCursor(modifiedLandmarks);
-                this.updateHandCursor(x, y);
+                this.handCursor.updateHandCursor(modifiedLandmarks);
             }
         },
-        updateHandCursor(x, y) {
-            let eventType = null;
+        // TODO package hand recognition into a js file
+        
 
-            // Perform actions based on the gesture
-            if (this.gesture.close) {
-                this.handCursor.mode = "draw";
-            } else {
-                this.handCursor.mode = "erase";
-            }
-            if (this.gesture.pinch) {
-                eventType = "mousedown";
-            } else {
-                eventType = "mouseup";
-            }
-            x *= window.innerWidth;
-            y *= window.innerHeight;
-
-            // calculating bx, by
-            // (brushX and brushY, which accounts for a lazy radius)
-            const dx = x - this.lastX;
-            const dy = y - this.lastY;
-            const dist = (dx ** 2 + dy ** 2) ** 0.5;
-
-            console.log(dist);
-            if (dist <= this.handCursor.lazyRadius) return;
-
-            const proportion = (dist - this.handCursor.lazyRadius) / dist;
-            this.handCursor.x = this.lastX + dx * proportion;
-            this.handCursor.y = this.lastY + dy * proportion;
-            this.lastX = this.handCursor.x;
-            this.lastY = this.handCursor.y;
-
-            let target = document.elementFromPoint(x, y) ?? document.body;
-            let eventOptions = {
-                bubbles: true, // Whether the event bubbles up through the DOM or not
-                cancelable: true, // Whether the event is cancelable
-                // Additional properties depending on the type of MouseEvent
-                clientX: this.handCursor.x, // X coordinate of the mouse pointer in client coordinates
-                clientY: this.handCursor.y, // Y coordinate of the mouse pointer in client coordinates
-            };
-
-            const moveEvent = new MouseEvent("mousemove", eventOptions);
-            target.dispatchEvent(moveEvent);
-
-            if (
-                (this.isDown && eventType === "mouseup") ||
-                (!this.isDown && eventType === "mousedown")
-            ) {
-                this.isDown = !this.isDown;
-                const mouseEvent = new MouseEvent(eventType, eventOptions);
-                target.dispatchEvent(mouseEvent);
-                if (eventType === "mouseup") {
-                    const clickEvent = new MouseEvent("click", eventOptions);
-                    target.dispatchEvent(clickEvent);
-                }
-            }
-        },
+        // TODO package into a dragging js file
         startDragging() {
             this.isDragging = true;
             this.startX = this.handCursor.x - this.divLeft;
