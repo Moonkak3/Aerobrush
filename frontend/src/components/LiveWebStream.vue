@@ -3,9 +3,6 @@
         class="card"
         ref="card"
         :style="{ top: divTop + 'px', left: divLeft + 'px' }"
-        @mousedown="startDragging"
-        @mousemove="dragging"
-        @mouseup="stopDragging"
     >
         <div class="container">
             <div class="live-stream-container">
@@ -14,11 +11,11 @@
             </div>
         </div>
 
-        <div class="text-container">
+        <!-- <div class="text-container">
             <h1 v-for="(value, key) in gesture" :key="key">
                 {{ key }}: {{ value }}
             </h1>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -41,7 +38,6 @@ export default {
             results: undefined,
             gesture: undefined,
 
-            
             handCursor: handCursorStore(),
 
             divTop: 20, // Initial top position
@@ -155,40 +151,16 @@ export default {
 
                 drawConnectors(canvasCtx, modifiedLandmarks, HAND_CONNECTIONS, {
                     color: "#00FF00",
-                    lineWidth: 2,
+                    lineWidth: 1,
                 });
                 drawLandmarks(canvasCtx, modifiedLandmarks, {
                     color: "#FF0000",
-                    lineWidth: 0.5,
+                    radius: 1,
                 });
                 // this.gesture = (get the mode)
                 this.handCursor.updateHandCursor(modifiedLandmarks);
             }
         },
-        // TODO package hand recognition into a js file
-        
-
-        // // TODO package into a dragging js file
-        // startDragging() {
-        //     this.isDragging = true;
-        //     this.startX = this.handCursor.x - this.divLeft;
-        //     this.startY = this.handCursor.y - this.divTop;
-        //     document.body.addEventListener("mousemove", this.dragging);
-        //     document.body.addEventListener("mouseup", this.stopDragging);
-        // },
-        // dragging() {
-        //     // console.log(event);
-        //     if (this.isDragging) {
-        //         this.divLeft = this.handCursor.x - this.startX;
-        //         this.divTop = this.handCursor.y - this.startY;
-        //     }
-        // },
-        // stopDragging() {
-        //     // cons+ole.log(event);
-        //     this.isDragging = false;
-        //     document.body.removeEventListener("mousemove", this.dragging);
-        //     document.body.removeEventListener("mouseup", this.stopDragging);
-        // },
     },
 };
 </script>
@@ -218,7 +190,8 @@ export default {
     -moz-transform: rotateY(180deg);
     display: block;
     aspect-ratio: 16/9;
-    height: 240px;
+    object-fit: contain;
+    width: 100%;
     position: relative;
     border-radius: 1rem;
     filter: grayscale(100%);
@@ -237,6 +210,8 @@ button {
 }
 
 .card {
+    max-height: 40vh;
+    max-width: 40vw;
     position: absolute;
     cursor: grab;
     z-index: 1;

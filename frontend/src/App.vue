@@ -10,6 +10,7 @@ import LiveWebStream from "./components/LiveWebStream.vue";
 import HandCursor from "./components/HandCursor.vue";
 import DrawingCanvas from "./components/DrawingCanvas.vue";
 
+document.body.style.cursor = "none";
 export default {
     name: "App",
     components: {

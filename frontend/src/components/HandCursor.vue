@@ -27,14 +27,14 @@ export default {
             // Update cursor position based on mouse movement
             const cursor = document.querySelector(".cursor");
             if (this.handCursor.mode === "draw") {
+                cursor.style.mixBlendMode = "";
                 cursor.style.backgroundColor = "#000000";
                 cursor.style.borderColor = "#ffffff";
             } else if (this.handCursor.mode === "erase") {
-                cursor.style.backgroundColor = "transparent";
+                cursor.style.mixBlendMode = "difference";
+                cursor.style.backgroundColor = "#ffffff";
                 cursor.style.borderColor = "#000000";
             }
-            
-
             cursor.style.left = event.clientX + "px";
             cursor.style.top = event.clientY + "px";
         },

@@ -7,7 +7,7 @@ export const handCursorStore = defineStore("handCursor", {
             x: 0,
             y: 0,
             mode: "draw",
-            lazyRadius: 20,
+            lazyRadius: 5,
 
             history: [],
             history_len: 2,
