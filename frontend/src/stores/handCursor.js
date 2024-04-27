@@ -7,7 +7,7 @@ export const handCursorStore = defineStore("handCursor", {
             x: 0,
             y: 0,
             mode: "draw",
-            lazyRadius: 5,
+            lazyRadius: 10,
 
             history: [],
             history_len: 2,
@@ -34,7 +34,6 @@ export const handCursorStore = defineStore("handCursor", {
             const dy = rawY - this.lastY;
             const dist = (dx ** 2 + dy ** 2) ** 0.5;
 
-            console.log(dist);
             if (dist <= this.lazyRadius) return;
 
             const proportion = (dist - this.lazyRadius) / dist;

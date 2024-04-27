@@ -12,16 +12,15 @@
 </template>
 
 <script>
+import paper from "paper";
 import { handCursorStore } from "@/stores/handCursor";
 export default {
     data() {
         return {
             isDrawing: false,
-            ctx: null,
-            lastX: [],
-            lastY: [],
+            path: null,
+            eraseLayer: null,
             lazyRadius: 10,
-            smoothing: "bezier",
             handCursor: handCursorStore(),
         };
     },
@@ -34,73 +33,52 @@ export default {
         this.$refs.background.height = 1080;
         this.$refs.background.left = (window.innerWidth - 1920) / 2;
         this.$refs.background.top = (window.innerHeight - 1080) / 2;
-        this.ctx = this.$refs.canvas.getContext("2d");
 
-        this.ctx.lineCap = "round";
-        this.ctx.lineJoin = "round";
-        this.ctx.lineWidth = 5;
-        this.ctx.strokeStyle = "#000000";
+        paper.setup(this.$refs.canvas);
+    },
+    beforeUnmount() {
+        paper.projects.forEach((project) => {
+            project.remove();
+        });
     },
     methods: {
-        startDrawing(event) {
+        startDrawing() {
+            this.path = new paper.Path({
+                strokeColor: "black",
+                strokeWidth: 10,
+                strokeCap: "round",
+            });
+
+            if (this.handCursor.mode === "draw") {
+                this.path.blendMode = "normal";
+            } else if (this.handCursor.mode === "erase") {
+                this.path.blendMode = "destination-out";
+            }
+
             this.isDrawing = true;
-            this.lastX = [];
-            this.lastY = [];
-            this.lastX.unshift(event.clientX - this.$refs.canvas.offsetLeft);
-            this.lastY.unshift(event.clientY - this.$refs.canvas.offsetTop);
-            while (this.lastX.length > 3) {
-                this.lastX.pop();
-            }
-            while (this.lastY.length > 3) {
-                this.lastY.pop();
-            }
+            paper.view.draw();
         },
         draw(event) {
-            if (!this.isDrawing) return;
-
+            if (!this.isDrawing) {
+                return;
+            }
             // cursor point
             const bx = event.clientX - this.$refs.canvas.offsetLeft;
             const by = event.clientY - this.$refs.canvas.offsetTop;
 
-            if (this.handCursor.mode === "draw") {
-                this.ctx.globalCompositeOperation = "source-over";
-            } else if (this.handCursor.mode === "erase") {
-                this.ctx.globalCompositeOperation = "destination-out";
-            }
-
-            this.ctx.beginPath();
-            if (this.smoothing === "bezier") {
-                this.ctx.moveTo(this.lastX[2], this.lastY[2]);
-                this.ctx.bezierCurveTo(
-                    this.lastX[1],
-                    this.lastY[1],
-                    this.lastX[0],
-                    this.lastY[0],
-                    bx,
-                    by
-                );
-            } else if (this.smoothing === "quadratic") {
-                this.ctx.moveTo(this.lastX[1], this.lastY[1]);
-                this.ctx.quadraticCurveTo(this.lastX[0], this.lastY[0], bx, by);
-            } else if (this.smoothing === "none") {
-                this.ctx.moveTo(this.lastX[0], this.lastY[0]);
-                this.ctx.lineTo(bx, by);
-            }
-            this.ctx.stroke();
-
-            this.lastX.unshift(bx);
-            this.lastY.unshift(by);
-            while (this.lastX.length > 3) {
-                this.lastX.pop();
-            }
-            while (this.lastY.length > 3) {
-                this.lastY.pop();
-            }
+            this.path.add(new paper.Point(bx, by));
+            this.path.smooth({ type: "continuous" });
         },
         stopDrawing() {
-            this.lastX = [];
-            this.lastY = [];
             this.isDrawing = false;
+            this.path.simplify();
+            const blendMode = this.path.blendMode;
+            this.path.blendMode = "normal";
+            let raster = this.path.rasterize();
+            this.path.remove();
+            raster.blendMode = blendMode;
+
+            paper.view.draw();
         },
     },
 };
