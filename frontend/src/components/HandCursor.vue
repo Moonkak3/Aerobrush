@@ -6,12 +6,14 @@
 
 <script>
 import { handCursorStore } from "@/stores/handCursor";
+import { brushStore } from "@/stores/brush";
 
 export default {
     name: "HandCursor",
     data() {
         return {
             handCursor: handCursorStore(),
+            brush: brushStore(),
         };
     },
     mounted() {
@@ -28,12 +30,12 @@ export default {
             const cursor = document.querySelector(".cursor");
             if (this.handCursor.mode === "draw") {
                 cursor.style.mixBlendMode = "";
-                cursor.style.backgroundColor = "#000000";
+                cursor.style.backgroundColor = this.brush.color;
                 cursor.style.borderColor = "#ffffff";
             } else if (this.handCursor.mode === "erase") {
                 cursor.style.mixBlendMode = "difference";
                 cursor.style.backgroundColor = "#ffffff";
-                cursor.style.borderColor = "#000000";
+                cursor.style.borderColor = this.brush.color;
             }
             cursor.style.left = event.clientX + "px";
             cursor.style.top = event.clientY + "px";

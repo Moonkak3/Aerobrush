@@ -1,21 +1,13 @@
 <template>
-    <div
-        class="card"
-        ref="card"
-        :style="{ top: divTop + 'px', left: divLeft + 'px' }"
-    >
-        <div class="container">
-            <div class="live-stream-container">
-                <video ref="videoElement" autoplay></video>
-                <canvas ref="canvasElement"></canvas>
-            </div>
-        </div>
-
-        <!-- <div class="text-container">
-            <h1 v-for="(value, key) in gesture" :key="key">
-                {{ key }}: {{ value }}
-            </h1>
-        </div> -->
+    <div ref="card" class="container">
+        <Card style="display: inline-block">
+            <template #header>
+                <div class="live-stream-container">
+                    <video ref="videoElement" autoplay></video>
+                    <canvas ref="canvasElement"></canvas>
+                </div>
+            </template>
+        </Card>
     </div>
 </template>
 
@@ -26,9 +18,12 @@ import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
 import { handCursorStore } from "@/stores/handCursor";
-import Draggable from "draggable";
+import Card from "primevue/card";
 
 export default {
+    components: {
+        Card,
+    },
     data() {
         return {
             // handCursor: handCursorStore(),
@@ -39,16 +34,11 @@ export default {
             gesture: undefined,
 
             handCursor: handCursorStore(),
-
-            divTop: 20, // Initial top position
-            divLeft: 20, // Initial left position
         };
     },
     mounted() {
         this.enableWebcam();
         this.createHandLandmarker();
-
-        new Draggable(this.$refs.card);
     },
     methods: {
         async createHandLandmarker() {
@@ -164,12 +154,18 @@ export default {
     },
 };
 </script>
-<style scoped>
+<style lang="scss" scoped>
+@import "../assets/stylesheets/main.scss";
+:deep(*) {
+    margin: 0;
+    padding: 0;
+}
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    position: fixed;
+    display: inline-block;
+    pointer-events: none;
+    top: 20px;
+    right: 20px;
 }
 .text-container {
     padding: 1rem;
@@ -179,8 +175,7 @@ export default {
     justify-content: left;
 }
 .live-stream-container {
-    display: block;
-    position: relative;
+    display: inline-block;
 }
 
 .live-stream-container video {
@@ -191,6 +186,8 @@ export default {
     display: block;
     aspect-ratio: 16/9;
     object-fit: contain;
+    max-width: 12vw;
+    max-height: 12vh;
     width: 100%;
     position: relative;
     border-radius: 1rem;
@@ -207,14 +204,6 @@ export default {
 
 button {
     margin: 2rem;
-}
-
-.card {
-    max-height: 40vh;
-    max-width: 40vw;
-    position: absolute;
-    cursor: grab;
-    z-index: 1;
 }
 
 h1 {

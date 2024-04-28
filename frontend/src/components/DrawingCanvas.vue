@@ -14,6 +14,8 @@
 <script>
 import paper from "paper";
 import { handCursorStore } from "@/stores/handCursor";
+import { brushStore } from "@/stores/brush";
+import { eraserStore } from "@/stores/eraser";
 export default {
     data() {
         return {
@@ -22,6 +24,8 @@ export default {
             eraseLayer: null,
             lazyRadius: 10,
             handCursor: handCursorStore(),
+            brush: brushStore(),
+            eraser: eraserStore(),
         };
     },
     mounted() {
@@ -43,16 +47,22 @@ export default {
     },
     methods: {
         startDrawing() {
-            this.path = new paper.Path({
-                strokeColor: "black",
-                strokeWidth: 10,
-                strokeCap: "round",
-            });
-
             if (this.handCursor.mode === "draw") {
-                this.path.blendMode = "normal";
+                this.path = new paper.Path({
+                    strokeColor: this.brush.color,
+                    strokeWidth: this.brush.size,
+                    opacity: this.brush.opacity,
+                    strokeCap: "round",
+                    blendMode: "normal",
+                });
             } else if (this.handCursor.mode === "erase") {
-                this.path.blendMode = "destination-out";
+                this.path = new paper.Path({
+                    strokeColor: this.eraser.color,
+                    strokeWidth: this.eraser.size,
+                    opacity: this.eraser.opacity,
+                    strokeCap: "round",
+                    blendMode: "destination-out",
+                });
             }
 
             this.isDrawing = true;
@@ -70,6 +80,9 @@ export default {
             this.path.smooth({ type: "continuous" });
         },
         stopDrawing() {
+            if (!this.path) {
+                return;
+            }
             this.isDrawing = false;
             this.path.simplify();
             const blendMode = this.path.blendMode;
