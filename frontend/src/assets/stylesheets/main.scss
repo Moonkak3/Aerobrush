@@ -5,14 +5,14 @@ $font-family_1: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
 
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
     font-family: $font-family_1;
 }
 html {
     width: 100vw;
 }
 body {
+    padding: 0;
+    margin: 0;
     background: $body-color;
     // background-image: radial-gradient(#111822, $primary-color);
 
@@ -37,48 +37,6 @@ body {
     flex-direction: column;
     color: $text-color;
     overflow-x: hidden;
-}
-
-.card {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    position: relative;
-    width: fit-content;
-    border-width: 0;
-    border-radius: 1rem;
-    overflow: hidden;
-    color: $text-color;
-    background-color: $body-color;
-    box-shadow: 0 0px 10px 2px rgba($body-color, 0.6);
-
-    .card-link::before {
-        content: "";
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        bottom: 0px;
-        left: 0px;
-    }
-
-    &.expanding {
-        &:hover {
-            z-index: 10;
-            transform: scale(1.05);
-        }
-    }
-    &.light:hover {
-        box-shadow: 0 4px 8px 0 rgba($primary-color, 0.8),
-    }
-    &.success:hover {
-        box-shadow: 0 4px 8px 0 rgba(#04aa6d, 0.8),
-    }
-    &.error:hover {
-        box-shadow: 0 4px 8px 0 rgba(#f44336, 0.8),
-    }
-    &.info:hover {
-        box-shadow: 0 4px 8px 0 rgba(#2196f3, 0.8),
-    }
 }
 
 button {
