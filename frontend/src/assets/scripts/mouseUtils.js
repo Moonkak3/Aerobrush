@@ -55,8 +55,6 @@ function handleCursor(x, y, clicked) {
     if (clicked && !isMouseDown) {
         isMouseDown = true;
         mouseDownElement = element; // Store the element where the mousedown occurred
-
-        console.log(mouseDownElement)
         const mouseDownEvent = new MouseEvent("mousedown", {
             clientX: x,
             clientY: y,

@@ -1,12 +1,14 @@
 <template>
     <div class="container">
         <SliderInput
+            class="opacity"
             v-model="opacity"
             :min="0"
             :max="1"
             :step="0.01"
         />
         <SliderInput
+            class="size"
             v-model="size"
             :min="1"
             :max="100"
@@ -54,6 +56,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/stylesheets/main.scss";
 .container {
     position: absolute;
     transform: translate(0, -50%);
@@ -62,16 +65,17 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background-color: $body-color;
 
-    width: 100px;
+    width: 60px;
     height: 70%;
+    padding: 32px 12px;
 }
-:deep(.p-slider) {
-    margin: 2rem;
-    width: 20px;
-    height: 40%;
+.opacity {
+    margin-bottom: 3rem;
 }
-:deep(.p-slider-handle) {
-    transform: scale(150%);
+:deep(.slider) {
+    width: 100%;
+    height: 100%;
 }
 </style>
