@@ -1,16 +1,20 @@
 import { createApp } from "vue";
-import { createPinia } from "pinia";
 import App from "./App.vue";
+
+import { createPinia } from "pinia";
+
 import PrimeVue from "primevue/config";
 import { definePreset } from "primevue/themes";
 import PrimeOne from "primevue/themes/primeone";
 import Aura from "primevue/themes/primeone/aura";
 
+import Buefy from "buefy";
+import "buefy/dist/buefy.css";
+
 const pinia = createPinia();
 const app = createApp(App);
 
 app.use(pinia);
-
 
 const Noir = definePreset(Aura, {
     semantic: {
@@ -73,6 +77,6 @@ app.use(PrimeVue, {
     },
 });
 
-
+app.use(Buefy)
 
 app.mount("#app");

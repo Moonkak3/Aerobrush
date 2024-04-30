@@ -7,7 +7,11 @@
             :max="1"
             :step="0.01"
         />
-        <color-input v-model="color" disable-alpha position="left center"/>
+        <b-colorpicker
+            v-model="color"
+            :position="'is-top-left'"
+            :representation="'triangle'"
+        />
         <SliderInput
             class="size"
             v-model="size"
@@ -23,13 +27,11 @@ import { handCursorStore } from "@/stores/handCursor";
 import { brushStore } from "@/stores/brush";
 import { eraserStore } from "@/stores/eraser";
 import { watch } from "vue";
-import ColorInput from "vue-color-input";
 import SliderInput from "@/components/SliderInput.vue";
 
 export default {
     components: {
         SliderInput,
-        ColorInput,
     },
     data() {
         return {
@@ -79,45 +81,46 @@ export default {
     border-radius: 12px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
-:deep(.color-input) {
+:deep(.colorpicker) {
     /* make clickable box a 100x100 circle */
     width: 100%;
-    border-radius: 12px;
     margin: 12px;
-}
-:deep(.color-input.user) {
-    .box {
+
+    .dropdown {
+        display: flex;
         width: 100%;
-        height: auto;
         aspect-ratio: 1;
-    }
-    .picker-popup {
-        height: auto;
-        width: 20vw;
-        .saturation-area {
-            aspect-ratio: 1;
+        .dropdown-trigger {
+            display: flex;
+            width: 100%;
             height: auto;
+            aspect-ratio: 1;
+            * {
+                display: flex;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 1;
+            }
+            span {
+                display: none;
+            }
+            button {
+                border-radius: 5px;
+            }
+        }
+        .dropdown-menu {
+            transform: translate(0%, -50%);
+            top: 0;
+            bottom: auto;
+            right: 150%;
+            left: auto;
+
+            svg.b-colorpicker-triangle {
+                width: auto;
+                height: 50vh;
+                aspect-ratio: 1;
+            }
         }
     }
-    // .slider {
-    //     /* thin out the sliders and make them wider */
-    //     height: 2px;
-    //     width: 92%;
-    // }
-    // .saturation-area {
-    //     /* bigger picking area */
-    //     height: 150px;
-    // }
-    // .slider-pointer {
-    //     /* make slider pointers square-ish and 10x10 */
-    //     border-radius: 4px;
-    //     width: 10px;
-    //     height: 10px;
-    // }
-    // .saturation-pointer {
-    //     /* increase saturation pointer size */
-    //     width: 40px;
-    //     height: 40px;
-    // }
 }
 </style>
