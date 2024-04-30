@@ -4,15 +4,14 @@
             <div
                 ref="thumb"
                 class="thumb"
-                :style="{ bottom: `${valuePercentage}%` }"
+                :style="{ bottom: `${positionPercentage}%` }"
             ></div>
             <div
                 ref="progress"
                 class="progress"
-                :style="{ height: `${valuePercentage}%` }"
+                :style="{ height: `${positionPercentage + 10}%` }"
             ></div>
         </div>
-        <div class="value">{{ value }}</div>
     </div>
 </template>
 
@@ -42,11 +41,11 @@ export default {
         };
     },
     computed: {
-        valuePercentage() {
+        positionPercentage() {
             return (
                 ((this.value - this.min) /
                     (this.max - this.min)) *
-                100
+                90
             );
         },
     },
@@ -94,25 +93,30 @@ export default {
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
+    width: 100%;
+    height: 100%;
 }
 .track {
     position: relative;
     height: 100%;
     width: 100%;
     background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
 }
 .thumb {
     position: absolute;
-    transform: translate(0%, 50%) scaleX(1.2);
-    height: 20px;
+    // transform: translate(0%, 50%);
+    height: 10%;
     width: 100%;
     background-color: rgb(200, 200, 200);
     z-index: 9;
+    border-radius: 5px;
 }
 .progress {
     position: absolute;
     width: 100%;
     background-color: rgba(255, 255, 255, 0.4);
     bottom: 0;
+    border-radius: 5px;
 }
 </style>

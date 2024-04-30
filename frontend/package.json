@@ -17,8 +17,9 @@
     "draggable": "^4.2.0",
     "paper": "^0.12.17",
     "pinia": "^2.1.7",
-    "primevue": "^3.52.0",
-    "vue": "^3.2.13"
+    "primevue": "^4.0.0-beta.1",
+    "vue": "^3.2.13",
+    "vue-color-input": "^1.0.8"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

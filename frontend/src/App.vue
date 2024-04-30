@@ -3,7 +3,7 @@
     <HandCursor class="cursor" />
     <BrushSettings class="UI"/>
     <LiveWebStream class="UI"/>
-    <DrawingCanvas />
+    <DrawingCanvas class="drawing-canvas"/>
 </template>
 
 <script>
@@ -38,5 +38,8 @@ export default {
 }
 .cursor {
     z-index: 99;
+}
+.drawing-canvas {
+    z-index: 5;
 }
 </style>

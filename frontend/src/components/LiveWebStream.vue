@@ -1,6 +1,6 @@
 <template>
-    <div ref="card" class="container">
-        <Card style="display: inline-block">
+    <div ref="card" >
+        <Card style="display: inline-block" class="container">
             <template #header>
                 <div class="live-stream-container">
                     <video ref="videoElement" autoplay></video>
@@ -156,7 +156,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "../assets/stylesheets/main.scss";
-:deep(*) {
+:deep(.p-card-body) {
     margin: 0;
     padding: 0;
 }
@@ -165,7 +165,9 @@ export default {
     display: inline-block;
     pointer-events: none;
     top: 20px;
-    right: 20px;
+    left: 20px;
+    z-index: 9;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 .text-container {
     padding: 1rem;
