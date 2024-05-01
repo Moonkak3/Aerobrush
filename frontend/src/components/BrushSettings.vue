@@ -1,23 +1,24 @@
 <template>
     <div class="container">
         <SliderInput
-            class="opacity"
-            v-model="opacity"
-            :min="0"
-            :max="1"
-            :step="0.01"
-        />
-        <b-colorpicker
-            v-model="color"
-            :position="'is-top-left'"
-            :representation="'triangle'"
-        />
-        <SliderInput
             class="size"
-            v-model="size"
+            v-model="this.brush.size"
             :min="1"
             :max="100"
             :step="1"
+        />
+        <b-colorpicker
+            v-model="this.brush.color"
+            :position="'is-top-left'"
+            :representation="'triangle'"
+        />
+
+        <SliderInput
+            class="opacity"
+            v-model="this.brush.opacity"
+            :min="0"
+            :max="1"
+            :step="0.01"
         />
     </div>
 </template>

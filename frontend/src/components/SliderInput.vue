@@ -1,15 +1,15 @@
 <template>
-    <div class="slider">
+    <div class="slider vertical">
         <div ref="track" class="track" @mousedown="startSliding">
             <div
                 ref="thumb"
                 class="thumb"
-                :style="{ bottom: `${positionPercentage}%` }"
+                :style="{ bottom: `${valuePercentage}%` }"
             ></div>
             <div
                 ref="progress"
                 class="progress"
-                :style="{ height: `${positionPercentage + 10}%` }"
+                :style="{ height: `${valuePercentage + 10}%` }"
             ></div>
         </div>
     </div>
@@ -19,6 +19,10 @@
 export default {
     name: "SliderInput",
     props: {
+        modelValue: {
+            type: Number,
+            required: true,
+        },
         min: {
             type: Number,
             default: 0,
@@ -34,19 +38,14 @@ export default {
     },
     data() {
         return {
-            value: this.min,
             isSliding: false,
-            startX: 0,
-            startValue: this.min,
+            startY: 0,
+            startValue: this.modelValue,
         };
     },
     computed: {
-        positionPercentage() {
-            return (
-                ((this.value - this.min) /
-                    (this.max - this.min)) *
-                90
-            );
+        valuePercentage() {
+            return ((this.modelValue - this.min) / (this.max - this.min)) * 100;
         },
     },
     mounted() {
@@ -61,7 +60,7 @@ export default {
         startSliding(event) {
             this.isSliding = true;
             this.startY = event.clientY;
-            this.startValue = this.value;
+            this.startValue = this.modelValue;
         },
         slide(event) {
             if (!this.isSliding) return;
@@ -78,7 +77,11 @@ export default {
             );
             const closestStep = Math.round(newValue / this.step) * this.step;
 
-            this.value = Math.max(this.min, Math.min(this.max, closestStep));
+            const newModelValue = Math.max(
+                this.min,
+                Math.min(this.max, closestStep)
+            );
+            this.$emit("update:modelValue", newModelValue);
         },
         stopSliding() {
             this.isSliding = false;
