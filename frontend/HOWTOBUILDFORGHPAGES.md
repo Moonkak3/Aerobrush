@@ -24,3 +24,11 @@ git commit -m "commit message"
 git subtree push --prefix frontend/dist origin gh-pages
 ```
 
+### All together
+```
+npm run build
+cd ..
+git add frontend/dist -f
+git commit -m "modified sensitivity of the hand detection, such that the border is more lenient and its easier to reach the edges of the screen"
+git subtree push --prefix frontend/dist origin gh-pages
+```
