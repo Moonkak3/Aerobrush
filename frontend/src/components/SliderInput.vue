@@ -45,7 +45,7 @@ export default {
     },
     computed: {
         valuePercentage() {
-            return ((this.modelValue - this.min) / (this.max - this.min)) * 100;
+            return ((this.modelValue - this.min) / (this.max - this.min)) * 90;
         },
     },
     mounted() {
@@ -114,6 +114,7 @@ export default {
     background-color: rgb(200, 200, 200);
     z-index: 9;
     border-radius: 5px;
+    transition: 50ms;
 }
 .progress {
     position: absolute;
@@ -121,5 +122,6 @@ export default {
     background-color: rgba(255, 255, 255, 0.4);
     bottom: 0;
     border-radius: 5px;
+    transition: 50ms;
 }
 </style>

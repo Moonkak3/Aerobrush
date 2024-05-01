@@ -2,7 +2,7 @@
     <div class="container">
         <SliderInput
             class="size"
-            v-model="this.brush.size"
+            v-model="currentMode.size"
             :min="1"
             :max="100"
             :step="1"
@@ -15,7 +15,7 @@
 
         <SliderInput
             class="opacity"
-            v-model="this.brush.opacity"
+            v-model="currentMode.opacity"
             :min="0"
             :max="1"
             :step="0.01"
@@ -43,6 +43,16 @@ export default {
             size: 5,
             color: "#0000FF",
         };
+    },
+    computed: {
+        currentMode() {
+            if (this.handCursor.mode === "draw") {
+                return this.brush;
+            } else if (this.handCursor.mode === "erase") {
+                return this.eraser;
+            }
+            return this.brush;
+        },
     },
     mounted() {
         this.unwatchHandCursor = watch(this.handCursor, (newState) => {
