@@ -20,11 +20,14 @@ export const handCursorStore = defineStore("handCursor", {
     },
     actions: {
         updateHandCursor(landmarks) {
+            // Multiplier for border of the hand detection
+            const borderMultiplier = 1.3;
+
             // handle position
             let [rawX, rawY] = getCursor(landmarks);
 
-            rawX = rawX * 1.2 - 0.1;
-            rawY = rawY * 1.2 - 0.1;
+            rawX = (rawX - 0.5) * borderMultiplier + 0.5;
+            rawY = (rawY - 0.5) * borderMultiplier + 0.5;
 
             rawX *= window.innerWidth;
             rawY *= window.innerHeight;

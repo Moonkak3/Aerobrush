@@ -1,5 +1,5 @@
 
-### Compiles and minifies for production
+### Compiles and minifies for production (do inside frontend)
 ```
 npm run build
 ```
