@@ -4,10 +4,15 @@
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Starts python backend server for collaborative whiteboarding
 
 ```
 python webserver.py
+```
+
+### Compiles and hot-reloads for development
+
+```
 npm run serve
 ```
 
