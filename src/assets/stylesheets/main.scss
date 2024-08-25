@@ -1,0 +1,40 @@
+@import "variables.scss";
+
+$font-family_1: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    "Lucida Sans", Arial, sans-serif;
+
+* {
+    box-sizing: border-box;
+    font-family: $font-family_1;
+}
+html {
+    width: 100vw;
+}
+body {
+    padding: 0;
+    margin: 0;
+    background: $body-color;
+    // background-image: radial-gradient(#111822, $primary-color);
+
+    background-image: radial-gradient(
+            circle at center,
+            hsla(232, 100%, 75%, 0.012),
+            hsla(232, 100%, 75%, 0.012),
+            transparent
+        ),
+        linear-gradient(to right, hsla(232, 100%, 75%, 0.01), transparent),
+        linear-gradient(to bottom, hsla(232, 100%, 75%, 0.01), transparent);
+
+    background-attachment: fixed;
+    background-color: hsl(
+        232,
+        20%,
+        7%
+    ); /* Modify to better match your desired base color */
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: $text-color;
+    overflow-x: hidden;
+}
