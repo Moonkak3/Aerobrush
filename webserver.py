@@ -1,5 +1,6 @@
 import asyncio
 import websockets
+import socket
 import json
 
 connected = set()
@@ -32,7 +33,9 @@ async def server(websocket, path):
         # Unregister the client
         connected.remove(websocket)
 
-start_server = websockets.serve(server, "192.168.10.189", 8765)
+host_ip = socket.gethostbyname(socket.gethostname())
+print("Host's IP: " + host_ip)
+start_server = websockets.serve(server, host_ip, 8765)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 print("WebSocket server started on ws://192.168.10.189:8765")
