@@ -8,7 +8,7 @@ export const handCursorStore = defineStore("handCursor", {
             x: 0,
             y: 0,
             mode: "draw",
-            lazyRadius: 10,
+            lazyRadius: 3,
 
             history: [],
             history_len: 2,
@@ -24,7 +24,7 @@ export const handCursorStore = defineStore("handCursor", {
             const borderMultiplier = 1.3;
 
             // handle position
-            let [rawX, rawY] = getCursor(landmarks);
+            let [rawX, rawY] = getCursor(landmarks, "pinch");
 
             rawX = (rawX - 0.5) * borderMultiplier + 0.5;
             rawY = (rawY - 0.5) * borderMultiplier + 0.5;
@@ -48,7 +48,7 @@ export const handCursorStore = defineStore("handCursor", {
 
             // handle gestures
 
-            this.history.unshift(getGesture(landmarks));
+            this.history.unshift(getGesture(landmarks, "pinch"));
             while (this.history.length > this.history_len) {
                 this.history.pop();
             }
@@ -56,7 +56,7 @@ export const handCursorStore = defineStore("handCursor", {
             if (
                 this.history.every(
                     (gesture) =>
-                        gesture.pinch === this.history[0].pinch &&
+                        gesture.mouseDown === this.history[0].mouseDown &&
                         gesture.close === this.history[0].close
                 )
             ) {
@@ -69,7 +69,7 @@ export const handCursorStore = defineStore("handCursor", {
             } else {
                 this.mode = "erase";
             }
-            handleCursor(this.x, this.y, this.gesture.pinch);
+            handleCursor(this.x, this.y, this.gesture.mouseDown);
         },
     },
 });

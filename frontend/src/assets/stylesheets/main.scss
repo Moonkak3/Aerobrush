@@ -38,33 +38,3 @@ body {
     color: $text-color;
     overflow-x: hidden;
 }
-
-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem 3rem;
-    font-size: 1.5rem;
-    border-style: solid;
-    border-radius: 40px;
-    border-width: 0;
-    // background-color: $accent-color;
-    background: linear-gradient(
-        to right,
-        hsl(350, 100%, 59%),
-        hsl(330, 100%, 59%)
-    );
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.5);
-    transition: 0.3s;
-    &.secondary {
-        color: $primary-color;
-        border-color: white;
-        background: $body-color;
-    }
-    &:hover {
-        background: white;
-        color: $primary-color;
-    }
-}

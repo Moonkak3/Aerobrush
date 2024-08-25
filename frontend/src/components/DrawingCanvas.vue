@@ -1,11 +1,12 @@
 <template>
-    <div>
+    <div class="container">
         <canvas
             id="canvas"
             ref="canvas"
             @mousedown="startDrawing"
             @mousemove="draw"
             @mouseup="stopDrawing"
+            @download-canvas="downloadCanvas"
         ></canvas>
         <canvas id="background" ref="background"></canvas>
     </div>
@@ -16,6 +17,7 @@ import paper from "paper";
 import { handCursorStore } from "@/stores/handCursor";
 import { brushStore } from "@/stores/brush";
 import { eraserStore } from "@/stores/eraser";
+import { eventBus } from "@/assets/scripts/eventBus";
 export default {
     data() {
         return {
@@ -29,6 +31,7 @@ export default {
             eraser: eraserStore(),
         };
     },
+    setup() {},
     mounted() {
         this.$refs.canvas.width = 1920;
         this.$refs.canvas.height = 1080;
@@ -40,13 +43,16 @@ export default {
         this.$refs.background.top = (window.innerHeight - 1080) / 2;
         paper.setup(this.$refs.canvas);
 
+        // Listen for the 'download' event on the event bus
+        eventBus.on("download", this.downloadCanvas);
+
         this.receivedPaths = {};
 
         // Initialize WebSocket connection
-        this.websocket = new WebSocket("ws://localhost:8765");
+        this.websocket = new WebSocket(`ws://${window.location.hostname}:8765`);
 
         this.websocket.onopen = () => {
-            console.log("WebSocket connection opened");
+            console.log("WebSocket connection opened at " + window.location.hostname);
         };
 
         this.websocket.onmessage = (event) => {
@@ -65,6 +71,8 @@ export default {
         if (this.websocket) {
             this.websocket.close();
         }
+        // Remove the event listener on unmount
+        eventBus.off("download", this.downloadCanvas);
     },
     methods: {
         startDrawing() {
@@ -114,8 +122,6 @@ export default {
             const bx = event.clientX - this.$refs.canvas.offsetLeft;
             const by = event.clientY - this.$refs.canvas.offsetTop;
 
-            this.path.add(new paper.Point(bx, by));
-            this.path.smooth({ type: "continuous" });
             if (
                 this.websocket &&
                 this.websocket.readyState === WebSocket.OPEN
@@ -123,6 +129,9 @@ export default {
                 this.websocket.send(
                     JSON.stringify({ action: "draw", point: { x: bx, y: by } })
                 );
+            } else {
+                this.path.add(new paper.Point(bx, by));
+                this.path.smooth({ type: "continuous" });
             }
         },
         stopDrawing() {
@@ -134,14 +143,15 @@ export default {
                 this.websocket.readyState === WebSocket.OPEN
             ) {
                 this.websocket.send(JSON.stringify({ action: "stopDrawing" }));
+            } else {
+                this.isDrawing = false;
+                this.path.simplify();
+                const blendMode = this.path.blendMode;
+                this.path.blendMode = "normal";
+                let raster = this.path.rasterize();
+                this.path.remove();
+                raster.blendMode = blendMode;
             }
-            this.isDrawing = false;
-            this.path.simplify();
-            const blendMode = this.path.blendMode;
-            this.path.blendMode = "normal";
-            let raster = this.path.rasterize();
-            this.path.remove();
-            raster.blendMode = blendMode;
 
             paper.view.draw();
         },
@@ -160,40 +170,44 @@ export default {
                     break;
                 }
                 case "draw": {
-                    this.receivedPaths[data.id].add(
-                        new paper.Point(data.point.x, data.point.y)
-                    );
-                    this.receivedPaths[data.id].smooth({ type: "continuous" });
+                    if (this.receivedPaths[data.id]) {
+                        this.receivedPaths[data.id].add(
+                            new paper.Point(data.point.x, data.point.y)
+                        );
+                        this.receivedPaths[data.id].smooth({
+                            type: "continuous",
+                        });
+                    }
                     break;
                 }
                 case "stopDrawing": {
-                    this.receivedPaths[data.id].simplify();
-                    let raster = this.receivedPaths[data.id].rasterize();
-                    raster.blendMode = this.receivedPaths[data.id].blendMode;
-                    this.receivedPaths[data.id].remove();
-                    this.receivedPaths[data.id] = null;
-                    paper.view.draw();
-                    break;
+                    if (this.receivedPaths[data.id]) {
+                        this.receivedPaths[data.id].simplify();
+                        const blendMode = this.receivedPaths[data.id].blendMode;
+                        this.receivedPaths[data.id].blendMode = "normal";
+
+                        let raster = this.receivedPaths[data.id].rasterize();
+                        raster.blendMode = blendMode;
+                        this.receivedPaths[data.id].remove();
+                        this.receivedPaths[data.id] = null;
+                        paper.view.draw();
+                        break;
+                    }
                 }
             }
-            // const receivedPath = new paper.Path({
-            //     strokeColor: data.strokeColor,
-            //     strokeWidth: data.strokeWidth,
-            //     opacity: data.opacity,
-            //     strokeCap: "round",
-            //     blendMode: data.blendMode,
-            // });
-            // data.points.forEach((point) => {
-            //     receivedPath.add(new paper.Point(point.x, point.y));
-            // });
-            // receivedPath.smooth({ type: "continuous" });
-
-            // receivedPath.simplify();
-            // const raster = receivedPath.rasterize();
-            // receivedPath.remove();
-            // raster.blendMode = data.blendMode;
-
-            // paper.view.draw();
+        },
+        downloadCanvas() {
+            console.log("downloading...");
+            const canvas = this.$refs.canvas;
+            if (!canvas) {
+                console.error("Canvas element is not available.");
+                return;
+            }
+            const dataURL = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = dataURL;
+            link.download = "canvas-image.png"; // Default file name
+            link.click();
         },
     },
 };
@@ -202,8 +216,8 @@ export default {
 <style scoped>
 canvas {
     position: fixed;
-    top: 0;
-    left: 0;
+    /* top: 0;
+    left: 0; */
     z-index: 0;
 }
 #canvas {
@@ -213,5 +227,13 @@ canvas {
 #background {
     z-index: -1;
     background-color: white;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
 }
 </style>

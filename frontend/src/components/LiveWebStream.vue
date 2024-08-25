@@ -1,5 +1,5 @@
 <template>
-    <div ref="card" >
+    <div v-if="webcamSupported" ref="card">
         <Card style="display: inline-block" class="container">
             <template #header>
                 <div class="live-stream-container">
@@ -9,11 +9,15 @@
             </template>
         </Card>
     </div>
+    <!-- <div v-else>
+        <p class="noClick">
+            Webcam access is not supported, as the website is run on the local
+            network using HTTP. Switch to localhost for computer vision support.
+        </p>
+    </div> -->
 </template>
 
 <script>
-// Import the necessary modules from the installed package
-// Important for tasks-vision to be installed as @0.10.0
 import { FilesetResolver, HandLandmarker } from "@mediapipe/tasks-vision";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
@@ -26,21 +30,34 @@ export default {
     },
     data() {
         return {
-            // handCursor: handCursorStore(),
+            webcamSupported: true, // Default to true, will be set based on actual support
             handLandmarker: undefined,
             webcamRunning: true,
             lastVideoTime: -1,
             results: undefined,
             gesture: undefined,
-
             handCursor: handCursorStore(),
         };
     },
     mounted() {
-        this.enableWebcam();
-        this.createHandLandmarker();
+        this.checkWebcamSupport();
+        if (this.webcamSupported) {
+            this.enableWebcam();
+            this.createHandLandmarker();
+        }
     },
     methods: {
+        async checkWebcamSupport() {
+            if (
+                !navigator.mediaDevices ||
+                !navigator.mediaDevices.getUserMedia
+            ) {
+                this.webcamSupported = false;
+                console.error(
+                    "getUserMedia() is not supported by your browser"
+                );
+            }
+        },
         async createHandLandmarker() {
             try {
                 const vision = await FilesetResolver.forVisionTasks(
@@ -58,8 +75,6 @@ export default {
                         numHands: 2,
                     }
                 );
-
-                // HandLandmarker is now initialized and ready to use
                 console.log("HandLandmarker initialized.");
             } catch (error) {
                 console.error("Error initializing HandLandmarker:", error);
@@ -72,17 +87,6 @@ export default {
                     aspectRatio: 16 / 9,
                 },
             };
-
-            if (
-                !navigator.mediaDevices ||
-                !navigator.mediaDevices.getUserMedia
-            ) {
-                console.error(
-                    "getUserMedia() is not supported by your browser"
-                );
-                return;
-            }
-
             try {
                 const stream = await navigator.mediaDevices.getUserMedia(
                     constraints
@@ -105,11 +109,6 @@ export default {
 
             canvasElement.width = videoElement.clientWidth;
             canvasElement.height = videoElement.clientHeight;
-
-            // if (this.runningMode === "IMAGE") {
-            //     this.runningMode = "VIDEO";
-            //     await this.handLandmarker.setOptions({ runningMode: "VIDEO" });
-            // }
 
             if (this.lastVideoTime !== videoElement.currentTime) {
                 this.lastVideoTime = videoElement.currentTime;
@@ -147,13 +146,13 @@ export default {
                     color: "#FF0000",
                     radius: 1,
                 });
-                // this.gesture = (get the mode)
                 this.handCursor.updateHandCursor(modifiedLandmarks);
             }
         },
     },
 };
 </script>
+
 <style lang="scss" scoped>
 @import "../assets/stylesheets/main.scss";
 :deep(.p-card-body) {
@@ -194,14 +193,18 @@ export default {
     position: relative;
     border-radius: 1rem;
     filter: grayscale(100%);
-    z-index: 1; /* Video is behind the canvas */
+    z-index: 1;
 }
 
 .live-stream-container canvas {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 2; /* Canvas is on top of the video */
+    z-index: 2;
+}
+
+.noClick {
+    pointer-events: none;
 }
 
 button {

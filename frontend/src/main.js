@@ -1,19 +1,21 @@
 import { createApp } from "vue";
+import ToastService from "primevue/toastservice";
 import App from "./App.vue";
 
 import { createPinia } from "pinia";
 
 import PrimeVue from "primevue/config";
-import { definePreset } from "primevue/themes";
-import PrimeOne from "primevue/themes/primeone";
-import Aura from "primevue/themes/primeone/aura";
+import { definePreset } from "@primevue/themes";
+import Aura from "@primevue/themes/aura";
 
 import Buefy from "buefy";
 import "buefy/dist/buefy.css";
+import "primeicons/primeicons.css";
 
 const pinia = createPinia();
 const app = createApp(App);
 
+app.use(ToastService);
 app.use(pinia);
 
 const Noir = definePreset(Aura, {
@@ -48,16 +50,16 @@ const Noir = definePreset(Aura, {
             },
             dark: {
                 primary: {
-                    color: "{zinc.50}",
-                    inverseColor: "{zinc.950}",
-                    hoverColor: "{zinc.100}",
-                    activeColor: "{zinc.200}",
+                    color: "{zinc.950}",
+                    inverseColor: "#ffffff",
+                    hoverColor: "{zinc.900}",
+                    activeColor: "{zinc.800}",
                 },
                 highlight: {
-                    background: "rgba(250, 250, 250, .16)",
-                    focusBackground: "rgba(250, 250, 250, .24)",
-                    color: "rgba(255,255,255,.87)",
-                    focusColor: "rgba(255,255,255,.87)",
+                    background: "{zinc.950}",
+                    focusBackground: "{zinc.700}",
+                    color: "#ffffff",
+                    focusColor: "#ffffff",
                 },
             },
         },
@@ -65,18 +67,10 @@ const Noir = definePreset(Aura, {
 });
 
 app.use(PrimeVue, {
-    // Default theme configuration
     theme: {
-        base: PrimeOne,
         preset: Noir,
-        options: {
-            prefix: "p",
-            darkModeSelector: "system",
-            cssLayer: false,
-        },
     },
 });
-
-app.use(Buefy)
+app.use(Buefy);
 
 app.mount("#app");
