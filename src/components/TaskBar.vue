@@ -131,7 +131,7 @@ export default defineComponent({
     grid-column-gap: 10px;
     justify-content: center;
     align-items: center;
-    background-color: white;
+    background-color: $body-color;
     padding: 10px;
     margin: 12px;
     border-radius: 100px;
@@ -143,15 +143,15 @@ export default defineComponent({
     border-radius: 100px;
 }
 .p-button-primary {
-    background-color: #000000;
-    color: #ffffff;
+    background-color: white;
+    color: black;
 }
 .p-button {
     border-color: transparent;
     border-width: 3px;
 }
 .p-button-text:not(:disabled):hover {
-    border-color: black;
+    border-color: white;
     border-width: 3px;
 }
 </style>
