@@ -101,7 +101,8 @@ export default defineComponent({
                     this.toast.add({
                         severity: "contrast",
                         summary: "Link copied successfully!",
-                        detail: "Paste this link into your browser on a device connected to the same network to share the whiteboard.",
+                        detail: `Paste this link into your browser on a device connected to the same network to share the whiteboard.
+                        Does not work on github pages.`,
                         life: 5000,
                     });
                 }
