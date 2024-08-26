@@ -1,11 +1,8 @@
 @import "variables.scss";
-
-$font-family_1: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", Arial, sans-serif;
+@import 'primeicons/primeicons.css';
 
 * {
     box-sizing: border-box;
-    font-family: $font-family_1;
 }
 html {
     width: 100vw;

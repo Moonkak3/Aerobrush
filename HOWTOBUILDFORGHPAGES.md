@@ -27,6 +27,6 @@ git subtree push --prefix dist origin gh-pages
 ```
 npm run build
 git add dist -f
-git commit -m "Added buttons for mouse accessibility, for download as well"
+git commit -m "Updated GitHub Pages. Check main branch for commits."
 git subtree push --prefix dist origin gh-pages
 ```
