@@ -51,9 +51,9 @@ function getCursor(lm, type = "pinch") {
     let cursor = null;
     switch (type) {
         case "pinch": {
-            const tips = avgPoint(lm[4], lm[8], 0.75);
-            const joints = avgPoint(lm[3], lm[6], 0.5);
-            cursor = avgPoint(tips, joints, 0.25);
+            const tips = avgPoint(lm[4], lm[8], 0.8);
+            const joints = avgPoint(lm[3], lm[7], 0.5);
+            cursor = avgPoint(tips, joints, 0.5);
             break;
         }
         case "point": {

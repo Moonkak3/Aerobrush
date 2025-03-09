@@ -1,5 +1,5 @@
 <template>
-    <div v-if="webcamSupported" ref="card">
+    <div v-if="webcamSupported" ref="card" class="noClick">
         <Card style="display: inline-block" class="container">
             <template #header>
                 <div class="live-stream-container">
@@ -8,6 +8,7 @@
                 </div>
             </template>
         </Card>
+        <canvas class="hand-overlay" ref="overlayElement"></canvas>
     </div>
     <!-- <div v-else>
         <p class="noClick">
@@ -106,9 +107,13 @@ export default {
             const videoElement = this.$refs.videoElement;
             const canvasElement = this.$refs.canvasElement;
             const canvasCtx = canvasElement.getContext("2d");
+            const overlayElement = this.$refs.overlayElement;
+            const overlayCtx = overlayElement.getContext("2d");
 
             canvasElement.width = videoElement.clientWidth;
             canvasElement.height = videoElement.clientHeight;
+            overlayElement.width = document.documentElement.clientWidth;
+            overlayElement.height = document.documentElement.clientHeight;
 
             if (this.lastVideoTime !== videoElement.currentTime) {
                 this.lastVideoTime = videoElement.currentTime;
@@ -124,15 +129,25 @@ export default {
                 canvasElement.width,
                 canvasElement.height
             );
+            overlayCtx.clearRect(
+                0,
+                0,
+                canvasElement.width,
+                canvasElement.height
+            );
             if (this.results && this.results.landmarks) {
-                this.interpretLandMarks(this.results.landmarks, canvasCtx);
+                this.interpretLandMarks(
+                    this.results.landmarks,
+                    canvasCtx,
+                    overlayCtx
+                );
             }
 
             if (this.webcamRunning) {
                 window.requestAnimationFrame(this.predictWebcam);
             }
         },
-        interpretLandMarks(resultsLandmarks, canvasCtx) {
+        interpretLandMarks(resultsLandmarks, canvasCtx, overlayCtx) {
             for (const landmarks of resultsLandmarks) {
                 const modifiedLandmarks = landmarks.map((point) => {
                     return { ...point, x: 1 - point.x };
@@ -145,6 +160,20 @@ export default {
                 drawLandmarks(canvasCtx, modifiedLandmarks, {
                     color: "#FF0000",
                     radius: 1,
+                });
+
+                drawConnectors(
+                    overlayCtx,
+                    modifiedLandmarks,
+                    HAND_CONNECTIONS,
+                    {
+                        color: "#00FF00",
+                        lineWidth: 5,
+                    }
+                );
+                drawLandmarks(overlayCtx, modifiedLandmarks, {
+                    color: "#FF0000",
+                    radius: 5,
                 });
                 this.handCursor.updateHandCursor(modifiedLandmarks);
             }
@@ -192,7 +221,7 @@ export default {
     width: 100%;
     position: relative;
     border-radius: 1rem;
-    filter: grayscale(100%);
+    filter: grayscale(70%);
     z-index: 1;
 }
 
@@ -201,6 +230,15 @@ export default {
     top: 0;
     left: 0;
     z-index: 2;
+}
+
+.hand-overlay {
+    position: absolute;
+    display: inline-block;
+    top: 0;
+    left: 0;
+    aspect-ratio: 16/9;
+    z-index: 999;
 }
 
 .noClick {
