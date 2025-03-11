@@ -4,14 +4,6 @@
 npm install
 ```
 
-### Starts python backend server for collaborative whiteboarding
-
-If python modules are missing, please install with `pip install 'module'`
-
-```
-python webserver.py
-```
-
 ### Compiles and hot-reloads for development
 
 Copy and paste the output "network" link into your browser.
