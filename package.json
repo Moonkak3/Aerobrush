@@ -19,6 +19,7 @@
     "draggable": "^4.2.0",
     "mitt": "^3.0.1",
     "paper": "^0.12.17",
+    "perfect-freehand": "^1.2.2",
     "pinia": "^2.1.7",
     "primeicons": "^7.0.0",
     "primevue": "^4.0.5",
