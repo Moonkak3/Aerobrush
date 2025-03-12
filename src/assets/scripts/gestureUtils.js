@@ -18,7 +18,7 @@ function getGesture(lm, type = "pinch") {
             // check if index and thumb are closed
             let distTip = dist3D(lm[4], lm[8]);
             let distJoint = dist3D(lm[3], lm[7]);
-            gesture.mouseDown = distTip < distJoint && distTip < threshold / 4;
+            gesture.mouseDown = distTip < distJoint && distTip < threshold / 5;
 
             // check if middle, ring and pinky are clenched
             gesture.close =

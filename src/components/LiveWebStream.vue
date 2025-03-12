@@ -136,22 +136,31 @@ export default {
                 canvasElement.height
             );
             if (this.results && this.results.landmarks) {
-                this.interpretLandMarks(
-                    this.results.landmarks,
-                    canvasCtx,
-                    overlayCtx
-                );
+                this.interpretLandMarks(this.results, canvasCtx, overlayCtx);
             }
 
             if (this.webcamRunning) {
                 window.requestAnimationFrame(this.predictWebcam);
             }
         },
-        interpretLandMarks(resultsLandmarks, canvasCtx, overlayCtx) {
-            for (const landmarks of resultsLandmarks) {
+        interpretLandMarks(results, canvasCtx, overlayCtx) {
+            for (let i = 0; i < results.landmarks.length; i++) {
+                const landmarks = results.landmarks[i];
+                // Handedness is flipped in the video :(
+                let handedness = "";
+                if (results.handednesses[i][0].categoryName === "Left") {
+                    handedness = "Right";
+                } else if (
+                    results.handednesses[i][0].categoryName === "Right"
+                ) {
+                    handedness = "Left";
+                }
+
                 const modifiedLandmarks = landmarks.map((point) => {
                     return { ...point, x: 1 - point.x };
                 });
+
+                console.log(handedness[0].categoryName);
 
                 drawConnectors(canvasCtx, modifiedLandmarks, HAND_CONNECTIONS, {
                     color: "#00FF00",
@@ -162,20 +171,21 @@ export default {
                     radius: 1,
                 });
 
+                const color = handedness === "Left" ? "#FF0000" : "#0000FF";
                 drawConnectors(
                     overlayCtx,
                     modifiedLandmarks,
                     HAND_CONNECTIONS,
                     {
-                        color: "#00FF00",
+                        color: color,
                         lineWidth: 5,
                     }
                 );
                 drawLandmarks(overlayCtx, modifiedLandmarks, {
-                    color: "#FF0000",
+                    color: "#000000",
                     radius: 5,
                 });
-                this.handCursor.updateHandCursor(modifiedLandmarks);
+                this.handCursor.updateHandCursor(handedness, modifiedLandmarks);
             }
         },
     },

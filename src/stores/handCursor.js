@@ -19,7 +19,7 @@ export const handCursorStore = defineStore("handCursor", {
         };
     },
     actions: {
-        updateHandCursor(landmarks) {
+        updateHandCursor(handedness, landmarks) {
             // Multiplier for border of the hand detection
             const borderMultiplier = 1;
 
