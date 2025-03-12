@@ -48,7 +48,6 @@ export default {
         eventBus.on("download", this.downloadCanvas);
 
         this.receivedPaths = {};
-
     },
     beforeUnmount() {
         paper.projects.forEach((project) => {
@@ -66,6 +65,7 @@ export default {
                 this.path = new paper.Path({
                     strokeColor: this.brush.color,
                     strokeWidth: this.brush.size,
+                    strokeJoin: "round",
                     opacity: this.brush.opacity,
                     strokeCap: "round",
                     blendMode: "normal",
@@ -74,6 +74,7 @@ export default {
                 this.path = new paper.Path({
                     strokeColor: this.eraser.color,
                     strokeWidth: this.eraser.size,
+                    strokeJoin: "round",
                     opacity: this.eraser.opacity,
                     strokeCap: "round",
                     blendMode: "destination-out",
@@ -91,14 +92,19 @@ export default {
             const by = event.clientY - this.$refs.canvas.offsetTop;
 
             this.path.add(new paper.Point(bx, by));
-            this.path.smooth({ type: "continuous" });
+            this.path.smooth({
+                type: "catmull-rom",
+                factor: 1,
+                from: -Math.min(10, this.path.segments.length),
+                to: -1,
+            });
         },
         stopDrawing() {
             if (!this.path) {
                 return;
             }
             this.isDrawing = false;
-            this.path.simplify();
+            // this.path.simplify();
             const blendMode = this.path.blendMode;
             this.path.blendMode = "normal";
             let raster = this.path.rasterize();
@@ -107,7 +113,7 @@ export default {
 
             paper.view.draw();
         },
-        
+
         downloadCanvas() {
             console.log("downloading...");
             const canvas = this.$refs.canvas;

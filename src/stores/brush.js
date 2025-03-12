@@ -3,9 +3,9 @@ import { defineStore } from "pinia";
 export const brushStore = defineStore("brush", {
     state: () => {
         return {
-            color: "#0000FF",
+            color: "#000000",
             size: 10,
-            opacity: 0.5,
+            opacity: 1,
         };
     },
 });
