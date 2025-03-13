@@ -231,7 +231,7 @@ export default {
     width: 100%;
     position: relative;
     border-radius: 1rem;
-    filter: grayscale(70%);
+    // filter: grayscale(70%);
     z-index: 1;
 }
 

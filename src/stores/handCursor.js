@@ -7,13 +7,17 @@ export const handCursorStore = defineStore("handCursor", {
         return {
             x: 0,
             y: 0,
+            rightX: 0,
+            rightY: 0,
+            leftX: 0,
+            leftY: 0,
+            isLeftDown: false,
+            isRightDown: false,
             mode: "draw",
             lazyRadius: 3,
 
             history: [],
             history_len: 2,
-            isDown: false,
-            isDragging: false,
             lastX: 0,
             lastY: 0,
         };
@@ -47,35 +51,40 @@ export const handCursorStore = defineStore("handCursor", {
             this.lastY = this.y;
 
             // handle gestures
+            // this.history.unshift(getGesture(landmarks, "pinch"));
+            // while (this.history.length > this.history_len) {
+            //     this.history.pop();
+            // }
+            // if (
+            //     this.history.every(
+            //         (gesture) =>
+            //             gesture.mouseDown === this.history[0].mouseDown &&
+            //             gesture.close === this.history[0].close
+            //     )
+            // ) {
+            //     this.gesture = this.history[0];
+            // }
 
-            this.history.unshift(getGesture(landmarks, "pinch"));
-            while (this.history.length > this.history_len) {
-                this.history.pop();
-            }
-
-            if (
-                this.history.every(
-                    (gesture) =>
-                        gesture.mouseDown === this.history[0].mouseDown &&
-                        gesture.close === this.history[0].close
-                )
-            ) {
-                this.gesture = this.history[0];
-            }
+            this.gesture = getGesture(landmarks, "pinch");
 
             // Perform actions based on the gesture
             if (handedness === "Right") {
-                if (this.gesture.close) {
-                    this.mode = "draw";
-                } else {
-                    this.mode = "erase";
-                }
+                this.rightX = this.x;
+                this.rightY = this.y;
+                this.mode = this.gesture.close ? "draw" : "erase";
+                this.isRightDown = this.gesture.mouseDown;
+                handleCursor(this.x, this.y, this.gesture.mouseDown);
             } else {
-                if (this.gesture.close) {
-                    this.mode = "pan";
+                // LEFT
+                this.leftX = this.x;
+                this.leftY = this.y;
+                if (this.gesture.mouseDown) {
+                    this.isLeftDown = true;
+                    handleCursor(this.x, this.y, this.gesture.mouseDown);
+                } else {
+                    this.isLeftDown = false;
                 }
             }
-            handleCursor(this.x, this.y, this.gesture.mouseDown);
         },
     },
 });

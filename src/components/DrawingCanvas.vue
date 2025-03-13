@@ -18,7 +18,6 @@
 
 <script>
 import paper from "paper";
-// import { getStroke } from "perfect-freehand";
 import { handCursorStore } from "@/stores/handCursor";
 import { brushStore } from "@/stores/brush";
 import { eraserStore } from "@/stores/eraser";
@@ -31,8 +30,11 @@ export default {
             path: null,
             eraseLayer: null,
             lazyRadius: 10,
-            panInitialOffsetX: -1,
-            panInitialOffsetY: -1,
+
+            panInitialZoom: null,
+            panInitalAngle: null,
+            panInitialOffsetX: null,
+            panInitialOffsetY: null,
 
             handCursor: handCursorStore(),
             brush: brushStore(),
@@ -89,8 +91,6 @@ export default {
                         blendMode: "destination-out",
                     });
                     break;
-                case "pan":
-                    break;
                 default:
                     break;
             }
@@ -101,91 +101,121 @@ export default {
             if (!this.isDrawing) {
                 return;
             }
-            switch (this.handCursor.mode) {
-                case "draw":
-                case "erase":
-                    {
-                        // cursor point
-                        const bx = event.clientX - this.$refs.canvas.offsetLeft;
-                        const by = event.clientY - this.$refs.canvas.offsetTop;
-
-                        this.path.add(new paper.Point(bx, by));
-                        this.path.smooth({
-                            type: "catmull-rom",
-                            factor: 1,
-                            from: -Math.min(10, this.path.segments.length),
-                            to: -1,
-                        });
-                    }
-                    break;
-                case "pan":
+            if (this.handCursor.isLeftDown) {
+                if (
+                    this.panInitialOffsetX == null ||
+                    this.panInitialOffsetY == null
+                ) {
+                    this.panInitialOffsetX =
+                        this.$refs.canvas.offsetLeft - this.handCursor.leftX;
+                    this.panInitialOffsetY =
+                        this.$refs.canvas.offsetTop - this.handCursor.leftY;
+                } else {
+                    this.$refs.canvas.style.left = `${
+                        this.panInitialOffsetX + this.handCursor.leftX
+                    }px`;
+                    this.$refs.canvas.style.top = `${
+                        this.panInitialOffsetY + this.handCursor.leftY
+                    }px`;
+                    this.$refs.background.style.left = `${
+                        this.panInitialOffsetX + this.handCursor.leftX
+                    }px`;
+                    this.$refs.background.style.top = `${
+                        this.panInitialOffsetY + this.handCursor.leftY
+                    }px`;
+                }
+                if (this.handCursor.isRightDown) {
                     if (
-                        this.panInitialOffsetX == -1 ||
-                        this.panInitialOffsetY == -1
+                        this.panInitalAngle == null ||
+                        this.panInitialZoom == null
                     ) {
-                        this.panInitialOffsetX =
-                            this.$refs.canvas.offsetLeft - event.clientX;
-                        this.panInitialOffsetY =
-                            this.$refs.canvas.offsetTop - event.clientY;
+                        this.panInitalAngle = Math.atan2(
+                            this.handCursor.rightY - this.handCursor.leftY,
+                            this.handCursor.rightX - this.handCursor.leftX
+                        );
+                        this.panInitialZoom = Math.sqrt(
+                            Math.pow(
+                                this.handCursor.rightX - this.handCursor.leftX,
+                                2
+                            ) +
+                                Math.pow(
+                                    this.handCursor.rightY -
+                                        this.handCursor.leftY,
+                                    2
+                                )
+                        );
                     } else {
-                        this.$refs.canvas.style.left = `${
-                            this.panInitialOffsetX + event.clientX
-                        }px`;
-                        this.$refs.canvas.style.top = `${
-                            this.panInitialOffsetY + event.clientY
-                        }px`;
-                        this.$refs.background.style.left = `${
-                            this.panInitialOffsetX + event.clientX
-                        }px`;
-                        this.$refs.background.style.top = `${
-                            this.panInitialOffsetY + event.clientY
-                        }px`;
+                        const angle = Math.atan2(
+                            this.handCursor.rightY - this.handCursor.leftY,
+                            this.handCursor.rightX - this.handCursor.leftX
+                        );
+                        const zoom = Math.sqrt(
+                            Math.pow(
+                                this.handCursor.rightX - this.handCursor.leftX,
+                                2
+                            ) +
+                                Math.pow(
+                                    this.handCursor.rightY -
+                                        this.handCursor.leftY,
+                                    2
+                                )
+                        );
+
+                        const rotation = angle - this.panInitalAngle;
+                        const scale = zoom / this.panInitialZoom;
+
+                        this.$refs.canvas.style.transform = `rotate(${rotation}rad) scale(${scale})`;
+                        this.$refs.background.style.transform = `rotate(${rotation}rad) scale(${scale})`;
                     }
-                    break;
-                default:
-                    break;
+                } else {
+                    this.panInitalAngle = null;
+                    this.panInitialZoom = null;
+                }
+            } else {
+                // cursor point
+                const bx = event.clientX - this.$refs.canvas.offsetLeft;
+                const by = event.clientY - this.$refs.canvas.offsetTop;
+
+                this.path.add(new paper.Point(bx, by));
+                this.path.smooth({
+                    type: "catmull-rom",
+                    factor: 1,
+                    from: -Math.min(10, this.path.segments.length),
+                    to: -1,
+                });
             }
         },
         stopDrawing() {
+            this.isDrawing = false;
             if (!this.path) {
                 return;
             }
-            this.isDrawing = false;
-            switch (this.handCursor.mode) {
-                case "draw":
-                case "erase":
-                    {
-                        const blendMode = this.path.blendMode;
-                        this.path.blendMode = "normal";
-                        let raster = this.path.rasterize();
-                        this.path.remove();
-                        raster.blendMode = blendMode;
+            const blendMode = this.path.blendMode;
+            this.path.blendMode = "normal";
+            let raster = this.path.rasterize();
+            this.path.remove();
+            raster.blendMode = blendMode;
 
-                        paper.view.draw();
-                    }
-                    break;
-                case "pan":
-                    this.panInitialOffsetX = -1;
-                    this.panInitialOffsetY = -1;
-                    break;
-                default:
-                    break;
-            }
+            paper.view.draw();
+            this.panInitialOffsetX = null;
+            this.panInitialOffsetY = null;
+            this.panInitalAngle = null;
+            this.panInitialZoom = null;
         },
+    },
 
-        downloadCanvas() {
-            console.log("downloading...");
-            const canvas = this.$refs.canvas;
-            if (!canvas) {
-                console.error("Canvas element is not available.");
-                return;
-            }
-            const dataURL = canvas.toDataURL("image/png");
-            const link = document.createElement("a");
-            link.href = dataURL;
-            link.download = "canvas-image.png"; // Default file name
-            link.click();
-        },
+    downloadCanvas() {
+        console.log("downloading...");
+        const canvas = this.$refs.canvas;
+        if (!canvas) {
+            console.error("Canvas element is not available.");
+            return;
+        }
+        const dataURL = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = dataURL;
+        link.download = "canvas-image.png"; // Default file name
+        link.click();
     },
 };
 </script>
