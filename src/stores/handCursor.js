@@ -64,10 +64,16 @@ export const handCursorStore = defineStore("handCursor", {
             }
 
             // Perform actions based on the gesture
-            if (this.gesture.close) {
-                this.mode = "draw";
+            if (handedness === "Right") {
+                if (this.gesture.close) {
+                    this.mode = "draw";
+                } else {
+                    this.mode = "erase";
+                }
             } else {
-                this.mode = "erase";
+                if (this.gesture.close) {
+                    this.mode = "pan";
+                }
             }
             handleCursor(this.x, this.y, this.gesture.mouseDown);
         },

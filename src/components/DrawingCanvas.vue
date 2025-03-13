@@ -1,11 +1,15 @@
 <template>
-    <div class="container">
+    <div
+        class="container"
+        id="panArea"
+        ref="panArea"
+        @mousedown="startDrawing"
+        @mousemove="draw"
+        @mouseup="stopDrawing"
+    >
         <canvas
             id="canvas"
             ref="canvas"
-            @mousedown="startDrawing"
-            @mousemove="draw"
-            @mouseup="stopDrawing"
             @download-canvas="downloadCanvas"
         ></canvas>
         <canvas id="background" ref="background"></canvas>
@@ -27,6 +31,9 @@ export default {
             path: null,
             eraseLayer: null,
             lazyRadius: 10,
+            panInitialOffsetX: -1,
+            panInitialOffsetY: -1,
+
             handCursor: handCursorStore(),
             brush: brushStore(),
             eraser: eraserStore(),
@@ -61,24 +68,31 @@ export default {
     },
     methods: {
         startDrawing() {
-            if (this.handCursor.mode === "draw") {
-                this.path = new paper.Path({
-                    strokeColor: this.brush.color,
-                    strokeWidth: this.brush.size,
-                    strokeJoin: "round",
-                    opacity: this.brush.opacity,
-                    strokeCap: "round",
-                    blendMode: "normal",
-                });
-            } else if (this.handCursor.mode === "erase") {
-                this.path = new paper.Path({
-                    strokeColor: this.eraser.color,
-                    strokeWidth: this.eraser.size,
-                    strokeJoin: "round",
-                    opacity: this.eraser.opacity,
-                    strokeCap: "round",
-                    blendMode: "destination-out",
-                });
+            switch (this.handCursor.mode) {
+                case "draw":
+                    this.path = new paper.Path({
+                        strokeColor: this.brush.color,
+                        strokeWidth: this.brush.size,
+                        strokeJoin: "round",
+                        opacity: this.brush.opacity,
+                        strokeCap: "round",
+                        blendMode: "normal",
+                    });
+                    break;
+                case "erase":
+                    this.path = new paper.Path({
+                        strokeColor: this.eraser.color,
+                        strokeWidth: this.eraser.size,
+                        strokeJoin: "round",
+                        opacity: this.eraser.opacity,
+                        strokeCap: "round",
+                        blendMode: "destination-out",
+                    });
+                    break;
+                case "pan":
+                    break;
+                default:
+                    break;
             }
             this.isDrawing = true;
             paper.view.draw();
@@ -87,31 +101,76 @@ export default {
             if (!this.isDrawing) {
                 return;
             }
-            // cursor point
-            const bx = event.clientX - this.$refs.canvas.offsetLeft;
-            const by = event.clientY - this.$refs.canvas.offsetTop;
+            switch (this.handCursor.mode) {
+                case "draw":
+                case "erase":
+                    {
+                        // cursor point
+                        const bx = event.clientX - this.$refs.canvas.offsetLeft;
+                        const by = event.clientY - this.$refs.canvas.offsetTop;
 
-            this.path.add(new paper.Point(bx, by));
-            this.path.smooth({
-                type: "catmull-rom",
-                factor: 1,
-                from: -Math.min(10, this.path.segments.length),
-                to: -1,
-            });
+                        this.path.add(new paper.Point(bx, by));
+                        this.path.smooth({
+                            type: "catmull-rom",
+                            factor: 1,
+                            from: -Math.min(10, this.path.segments.length),
+                            to: -1,
+                        });
+                    }
+                    break;
+                case "pan":
+                    if (
+                        this.panInitialOffsetX == -1 ||
+                        this.panInitialOffsetY == -1
+                    ) {
+                        this.panInitialOffsetX =
+                            this.$refs.canvas.offsetLeft - event.clientX;
+                        this.panInitialOffsetY =
+                            this.$refs.canvas.offsetTop - event.clientY;
+                    } else {
+                        this.$refs.canvas.style.left = `${
+                            this.panInitialOffsetX + event.clientX
+                        }px`;
+                        this.$refs.canvas.style.top = `${
+                            this.panInitialOffsetY + event.clientY
+                        }px`;
+                        this.$refs.background.style.left = `${
+                            this.panInitialOffsetX + event.clientX
+                        }px`;
+                        this.$refs.background.style.top = `${
+                            this.panInitialOffsetY + event.clientY
+                        }px`;
+                    }
+                    break;
+                default:
+                    break;
+            }
         },
         stopDrawing() {
             if (!this.path) {
                 return;
             }
             this.isDrawing = false;
-            // this.path.simplify();
-            const blendMode = this.path.blendMode;
-            this.path.blendMode = "normal";
-            let raster = this.path.rasterize();
-            this.path.remove();
-            raster.blendMode = blendMode;
+            switch (this.handCursor.mode) {
+                case "draw":
+                case "erase":
+                    {
+                        const blendMode = this.path.blendMode;
+                        this.path.blendMode = "normal";
+                        let raster = this.path.rasterize();
+                        this.path.remove();
+                        raster.blendMode = blendMode;
 
-            paper.view.draw();
+                        paper.view.draw();
+                    }
+                    break;
+                case "pan":
+                    this.panInitialOffsetX = -1;
+                    this.panInitialOffsetY = -1;
+                    break;
+                default:
+                    break;
+            }
         },
 
         downloadCanvas() {

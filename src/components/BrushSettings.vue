@@ -78,7 +78,7 @@ export default {
     position: absolute;
     transform: translate(0, -50%);
     top: 50%;
-    right: 0;
+    left: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
