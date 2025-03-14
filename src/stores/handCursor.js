@@ -73,17 +73,18 @@ export const handCursorStore = defineStore("handCursor", {
                 this.rightY = this.y;
                 this.mode = this.gesture.close ? "draw" : "erase";
                 this.isRightDown = this.gesture.mouseDown;
-                handleCursor(this.x, this.y, this.gesture.mouseDown);
             } else {
                 // LEFT
                 this.leftX = this.x;
                 this.leftY = this.y;
                 if (this.gesture.mouseDown) {
                     this.isLeftDown = true;
-                    handleCursor(this.x, this.y, this.gesture.mouseDown);
                 } else {
                     this.isLeftDown = false;
                 }
+            }
+            if (!this.isRightDown || handedness === "Right") {
+                handleCursor(this.x, this.y, this.gesture.mouseDown);
             }
         },
     },

@@ -123,8 +123,8 @@ export default {
             transform: translate(0%, -50%);
             top: 0;
             bottom: auto;
-            right: 150%;
-            left: auto;
+            left: 150%;
+            right: auto;
 
             svg.b-colorpicker-triangle {
                 width: auto;

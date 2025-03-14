@@ -160,8 +160,6 @@ export default {
                     return { ...point, x: 1 - point.x };
                 });
 
-                console.log(handedness[0].categoryName);
-
                 drawConnectors(canvasCtx, modifiedLandmarks, HAND_CONNECTIONS, {
                     color: "#00FF00",
                     lineWidth: 1,

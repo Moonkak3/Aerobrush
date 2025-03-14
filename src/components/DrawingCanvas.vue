@@ -31,6 +31,8 @@ export default {
             eraseLayer: null,
             lazyRadius: 10,
 
+            scale: 1,
+            rotation: 0,
             panInitialZoom: null,
             panInitalAngle: null,
             panInitialOffsetX: null,
@@ -45,12 +47,8 @@ export default {
     mounted() {
         this.$refs.canvas.width = 1920;
         this.$refs.canvas.height = 1080;
-        this.$refs.canvas.left = (window.innerWidth - 1920) / 2;
-        this.$refs.canvas.top = (window.innerHeight - 1080) / 2;
         this.$refs.background.width = 1920;
         this.$refs.background.height = 1080;
-        this.$refs.background.left = (window.innerWidth - 1920) / 2;
-        this.$refs.background.top = (window.innerHeight - 1080) / 2;
         paper.setup(this.$refs.canvas);
 
         // Listen for the 'download' event on the event bus
@@ -62,9 +60,6 @@ export default {
         paper.projects.forEach((project) => {
             project.remove();
         });
-        if (this.websocket) {
-            this.websocket.close();
-        }
         // Remove the event listener on unmount
         eventBus.off("download", this.downloadCanvas);
     },
@@ -161,20 +156,38 @@ export default {
                                 )
                         );
 
-                        const rotation = angle - this.panInitalAngle;
-                        const scale = zoom / this.panInitialZoom;
+                        this.rotation = angle - this.panInitalAngle;
+                        this.scale = zoom / this.panInitialZoom;
 
-                        this.$refs.canvas.style.transform = `rotate(${rotation}rad) scale(${scale})`;
-                        this.$refs.background.style.transform = `rotate(${rotation}rad) scale(${scale})`;
+                        // Update transform with translate included to keep centered
+                        this.$refs.canvas.style.transform = `translate(-50%, -50%) rotate(${this.rotation}rad) scale(${this.scale})`;
+                        this.$refs.background.style.transform = `translate(-50%, -50%) rotate(${this.rotation}rad) scale(${this.scale})`;
                     }
                 } else {
                     this.panInitalAngle = null;
                     this.panInitialZoom = null;
                 }
             } else {
-                // cursor point
-                const bx = event.clientX - this.$refs.canvas.offsetLeft;
-                const by = event.clientY - this.$refs.canvas.offsetTop;
+                // Drawing functionality
+                if (!this.path) return;
+
+                // Calculate position relative to center (since transform origin is center)
+                const relativeX = event.clientX - this.$refs.canvas.offsetLeft;
+                const relativeY = event.clientY - this.$refs.canvas.offsetTop;
+
+                // Apply inverse rotation around the center
+                const cos = Math.cos(-this.rotation);
+                const sin = Math.sin(-this.rotation);
+                const rotatedX = relativeX * cos - relativeY * sin;
+                const rotatedY = relativeX * sin + relativeY * cos;
+
+                // Calculate center of the canvas
+                const centerX = this.$refs.canvas.width / 2;
+                const centerY = this.$refs.canvas.height / 2;
+
+                // Convert back to canvas coordinates and apply scale
+                const bx = rotatedX / this.scale + centerX;
+                const by = rotatedY / this.scale + centerY;
 
                 this.path.add(new paper.Point(bx, by));
                 this.path.smooth({
@@ -202,20 +215,19 @@ export default {
             this.panInitalAngle = null;
             this.panInitialZoom = null;
         },
-    },
-
-    downloadCanvas() {
-        console.log("downloading...");
-        const canvas = this.$refs.canvas;
-        if (!canvas) {
-            console.error("Canvas element is not available.");
-            return;
-        }
-        const dataURL = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
-        link.href = dataURL;
-        link.download = "canvas-image.png"; // Default file name
-        link.click();
+        downloadCanvas() {
+            console.log("downloading...");
+            const canvas = this.$refs.canvas;
+            if (!canvas) {
+                console.error("Canvas element is not available.");
+                return;
+            }
+            const dataURL = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = dataURL;
+            link.download = "canvas-image.png"; // Default file name
+            link.click();
+        },
     },
 };
 </script>
@@ -223,10 +235,13 @@ export default {
 <style scoped>
 canvas {
     position: fixed;
-    /* top: 0;
-    left: 0; */
+    top: calc(50vh);
+    left: calc(50vw);
     z-index: 0;
+    transform: translate(-50%, -50%);
+    transform-origin: center center; /* This ensures rotation happens around center */
 }
+
 #canvas {
     background-color: transparent;
 }
