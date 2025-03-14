@@ -201,7 +201,7 @@ export default {
     display: inline-block;
     pointer-events: none;
     top: 20px;
-    left: 20px;
+    right: 20px;
     z-index: 9;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
