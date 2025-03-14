@@ -83,9 +83,7 @@ export const handCursorStore = defineStore("handCursor", {
                     this.isLeftDown = false;
                 }
             }
-            if (!this.isRightDown || handedness === "Right") {
-                handleCursor(this.x, this.y, this.gesture.mouseDown);
-            }
+            handleCursor(this.x, this.y, this.gesture.mouseDown, handedness);
         },
     },
 });
