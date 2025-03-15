@@ -27,6 +27,7 @@ git subtree push --prefix dist origin gh-pages
 ```
 npm run build
 git add dist -f
-git commit -m "changed how the taskbar looks to look cohesive with the brushsettings bar, and made the canvas be smaller on screens with different viewport sizes"
+git commit -m "fixed bug where canvas drawing size is much smaller than background size when scaled down (esp for mobile)"
 git subtree push --prefix dist origin gh-pages
+
 ```

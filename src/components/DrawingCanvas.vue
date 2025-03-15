@@ -42,6 +42,7 @@ export default {
     },
     setup() {},
     mounted() {
+        paper.setup(this.$refs.canvas);
         this.$refs.canvas.width = 1920;
         this.$refs.canvas.height = 1080;
         this.$refs.background.width = 1920;
@@ -49,7 +50,6 @@ export default {
         this.scale = window.innerWidth / 2400;
         this.$refs.canvas.style.transform = `translate(-50%, -50%) scale(${this.scale})`;
         this.$refs.background.style.transform = `translate(-50%, -50%) scale(${this.scale})`;
-        paper.setup(this.$refs.canvas);
 
         // Listen for the 'download' event on the event bus
         eventBus.on("download", this.downloadCanvas);
