@@ -251,8 +251,10 @@ export default {
 <style scoped>
 canvas {
     position: fixed;
-    top: calc(50vh);
-    left: calc(50vw);
+    width: 1920px;
+    height: 1080px;
+    top: 50vh;
+    left: 50vw;
     z-index: 0;
     transform: translate(-50%, -50%);
     transform-origin: center center; /* This ensures rotation happens around center */

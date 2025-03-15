@@ -27,7 +27,7 @@ git subtree push --prefix dist origin gh-pages
 ```
 npm run build
 git add dist -f
-git commit -m "fixed bug where canvas drawing size is much smaller than background size when scaled down (esp for mobile)"
+git commit -m "fixed bug where canvas drawing size is much smaller than background size when scaled down (esp for mobile) part2"
 git subtree push --prefix dist origin gh-pages
 
 ```
