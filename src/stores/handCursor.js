@@ -25,6 +25,7 @@ export const handCursorStore = defineStore("handCursor", {
     actions: {
         updateHandCursor(handedness, landmarks) {
             // Multiplier for border of the hand detection
+            // If want to edit this, need to also edit hand overlay :( more work. Keep to 1 for now
             const borderMultiplier = 1;
 
             // handle position

@@ -3,7 +3,6 @@
         <Button
             :class="{ 'p-button-primary': handCursor.mode === 'draw' }"
             text
-            rounded
             aria-label="Draw"
             @click="selectButton('draw')"
         >
@@ -12,7 +11,6 @@
         <Button
             :class="{ 'p-button-primary': handCursor.mode === 'erase' }"
             text
-            rounded
             aria-label="Erase"
             @click="selectButton('erase')"
         >
@@ -27,10 +25,10 @@
     >
       <i class="pi pi-arrows-alt"></i>
     </Button> -->
-        <Button text rounded aria-label="Download" @click="downloadCanvas">
+        <Button text aria-label="Download" @click="downloadCanvas">
             <i class="pi pi-download"></i>
         </Button>
-        <Button text rounded aria-label="Share" @click="share">
+        <Button text aria-label="Share" @click="share">
             <i class="pi pi-link" :value="link" ref="share"></i>
         </Button>
     </div>
@@ -124,22 +122,22 @@ export default defineComponent({
     position: absolute;
     transform: translate(-50%, 0);
     left: 50%;
-    bottom: 5%;
+    bottom: 0;
     display: grid;
     grid-auto-flow: column;
     grid-column-gap: 10px;
     justify-content: center;
     align-items: center;
     background-color: $body-color;
-    padding: 10px;
+    padding: 12px;
     margin: 12px;
-    border-radius: 100px;
+    border-radius: 12px;
     box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 20px;
 }
 .pi {
     font-size: 2rem;
     padding: 4px;
-    border-radius: 100px;
+    border-radius: 12px;
 }
 .p-button-primary {
     background-color: white;

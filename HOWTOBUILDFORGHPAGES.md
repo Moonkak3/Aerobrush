@@ -27,6 +27,6 @@ git subtree push --prefix dist origin gh-pages
 ```
 npm run build
 git add dist -f
-git commit -m "Updated GitHub Pages. Check main branch for commits."
+git commit -m "changed how the taskbar looks to look cohesive with the brushsettings bar, and made the canvas be smaller on screens with different viewport sizes"
 git subtree push --prefix dist origin gh-pages
 ```

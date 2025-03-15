@@ -46,6 +46,9 @@ export default {
         this.$refs.canvas.height = 1080;
         this.$refs.background.width = 1920;
         this.$refs.background.height = 1080;
+        this.scale = window.innerWidth / 2400;
+        this.$refs.canvas.style.transform = `translate(-50%, -50%) scale(${this.scale})`;
+        this.$refs.background.style.transform = `translate(-50%, -50%) scale(${this.scale})`;
         paper.setup(this.$refs.canvas);
 
         // Listen for the 'download' event on the event bus
